@@ -8,6 +8,7 @@ from itertools import groupby
 from functools import cached_property
 
 from gloe._utils import _format_return_annotation
+import networkx as nx
 
 __all__ = ["BaseTransformer", "TransformerException", "PreviousTransformer"]
 
@@ -168,10 +169,10 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
     def input_annotation(self) -> str:
         return self.input_type.__name__
 
-    def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}) -> str:
+    def _add_net_node(self, net: nx.Graph, custom_data: dict[str, Any] = {}) -> str:
         node_id = self.node_id
         props = {**self.graph_node_props, **custom_data, "label": self.label}
-        if node_id not in net.nodes:
+        if node_id not in net.nodes():
             net.add_node(node_id, **props)
         else:
             nx.set_node_attributes(net, {node_id: props})
@@ -179,7 +180,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     def _add_child_node(self,
         child: "BaseTransformer",
-        child_net: DiGraph,
+        child_net: nx.DiGraph,
         parent_id: str,
         next_node: "BaseTransformer",
     ):
@@ -189,9 +190,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
     def node_id(self) -> str:
         return str(self.instance_id)
 
-    def _add_children_subgraph(self, net: DiGraph, next_node: "BaseTransformer"):
+    def _add_children_subgraph(self, net: nx.DiGraph, next_node: "BaseTransformer"):
         next_node_id = next_node.node_id
-        children_nets = [DiGraph() for _ in self.children]
+        children_nets = [nx.DiGraph() for _ in self.children]
 
         for child, child_net in zip(self.children, children_nets):
             self._add_child_node(child, child_net, self.node_id, next_node)
@@ -204,7 +205,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             if child_final_node != next_node_id:
                 net.add_edge(child_final_node, next_node_id, label=next_node.input_annotation)
 
-    def _dag(self, net: DiGraph, next_node: Union["BaseTransformer", None] = None, custom_data: dict[str, Any] = {}) -> None:
+    def _dag(self, net: nx.DiGraph, next_node: Union["BaseTransformer", None] = None, custom_data: dict[str, Any] = {}) -> None:
         in_nodes = [edge[1] for edge in net.in_edges()]
 
         if self.previous is not None:
@@ -232,7 +233,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         if len(self.children) > 0 and next_node is not None:
             self._add_children_subgraph(net, next_node)
 
-    def graph(self) -> DiGraph:
+    def graph(self) -> nx.DiGraph:
         net = nx.DiGraph()
         net.graph["splines"] = "ortho"
         self._dag(net)
@@ -246,7 +247,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             if "parent_id" in node[1] and "bounding_box" in node[1]
         ]
         if not with_edge_labels:
-            for u, v in net.edges:
+            for u, v in net.edges():
                 net.edges[u, v]["label"] = ""
 
         agraph = nx.nx_agraph.to_agraph(net)

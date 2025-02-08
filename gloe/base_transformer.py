@@ -2,9 +2,10 @@ import copy
 import types
 import uuid
 from inspect import Signature
-from typing import Generic, TypeVar, Union, Callable, Iterable, get_args, get_origin, TypeAlias
+from typing import Any, Callable, Generic, TypeVar, Union, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
+from functools import cached_property
 
 from gloe._utils import _format_return_annotation
 
@@ -87,8 +88,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             return self.id == other.id
         return NotImplemented
 
-    def copy(
-        self,
+    def copy(self,
         transform: Callable[[_Self, _In], _Out] | None = None,
         regenerate_instance_id: bool = False,
     ) -> _Self:
@@ -107,17 +107,23 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
         return copied
 
-    @property
-    def graph_nodes(self) -> dict[UUID, "BaseTransformer"]:
-        nodes = {self.instance_id: self}
+    @cached_property
+    def visible_previous(self) -> PreviousTransformer["BaseTransformer"]:
+        previous = self.previous
 
-        if self.previous is not None:
-            nodes = {**nodes, **self.previous.graph_nodes}
+        if isinstance(previous, BaseTransformer):
+            if previous.invisible:
+                if previous.previous is None:
+                    return previous
 
-        for child in self.children:
-            nodes = {**nodes, **child.graph_nodes}
+                if type(previous.previous) == tuple:
+                    return previous.previous
 
-        return nodes
+                return previous.visible_previous
+            else:
+                return previous
+
+        return previous
 
     def _set_previous(self, previous: PreviousTransformer):
         self._previous = previous
@@ -162,7 +168,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
     def input_annotation(self) -> str:
         return self.input_type.__name__
 
-    def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}):
+    def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}) -> str:
         node_id = self.node_id
         props = {**self.graph_node_props, **custom_data, "label": self.label}
         if node_id not in net.nodes:
@@ -199,7 +205,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             if child_final_node != next_node_id:
                 net.add_edge(child_final_node, next_node_id, label=next_node.input_annotation)
 
-    def _dag(self, net: DiGraph, next_node: Union["BaseTransformer", None] = None, custom_data: dict[str, Any] = {}):
+    def _dag(self, net: DiGraph, next_node: Union["BaseTransformer", None] = None, custom_data: dict[str, Any] = {}) -> None:
         in_nodes = [edge[1] for edge in net.in_edges()]
 
         if self.previous is not None:

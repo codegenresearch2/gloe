@@ -1,6 +1,4 @@
-from typing import TypeVar, get_origin, TypeAlias, TypedDict, Generic, Union, get_args
-
-# type: ignore
+from typing import TypeVar, GenericAlias
 
 _T = TypeVar('_T')
 
@@ -36,7 +34,7 @@ def _format_union(
                 input_annotation,
             )
         )
-    return f'({' | '.join(formatted)})'
+    return f'({'|'.join(formatted)})'
 
 
 def _format_generic_alias(

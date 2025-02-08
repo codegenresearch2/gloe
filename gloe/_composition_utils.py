@@ -6,7 +6,7 @@ from typing import TypeVar, Any, cast
 from gloe.async_transformer import AsyncTransformer
 from gloe.base_transformer import BaseTransformer
 from gloe.transformers import Transformer
-from gloe._utils import _match_types, _specify_types, awaitify
+from gloe._utils import _match_types, _specify_types
 from gloe.exceptions import UnsupportedTransformerArgException
 
 _In = TypeVar('_In')
@@ -62,7 +62,7 @@ def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) 
     output_generic_vars = _match_types(signature1.return_annotation, transformer2.input_type)
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
-    def transformer1_signature(self: Any) -> Signature:
+    def transformer1_signature(_):
         return signature1.replace(
             return_annotation=_specify_types(signature1.return_annotation, generic_vars)
         )
@@ -74,10 +74,10 @@ def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) 
     )
 
     class BaseNewTransformer:
-        def signature(self: Any) -> Signature:
+        def signature() -> Signature:
             return _resolve_serial_connection_signatures(transformer2, generic_vars, signature2)
 
-        def __len__(self: Any) -> int:
+        def __len__() -> int:
             return len(transformer1) + len(transformer2)
 
     new_transformer = None
@@ -153,14 +153,14 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
             )
 
     class BaseNewTransformer:
-        def signature(self: Any) -> Signature:
+        def signature() -> Signature:
             receiving_signature_returns = [r.return_annotation for r in receiving_signatures]
             new_signature = incident_signature.replace(
                 return_annotation=GenericAlias(tuple, tuple(receiving_signature_returns))
             )
             return new_signature
 
-        def __len__(self: Any) -> int:
+        def __len__() -> int:
             lengths = [len(t) for t in receiving_transformers]
             return sum(lengths) + len(incident_transformer)
 

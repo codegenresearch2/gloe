@@ -139,7 +139,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         orig_class = getattr(self, "__orig_class__", None)
 
         specific_args = {}
-        if len(transformer_args) == 1 and len(get_args(orig_class)) == 1:
+        if (len(transformer_args) == 1 and len(get_args(orig_class)) == 1):
             specific_args = {generic: specific for generic, specific in zip(get_args(orig_class)[0], transformer_args[0])}
 
         signature = inspect.signature(self.transform)

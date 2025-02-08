@@ -129,10 +129,10 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
     def _set_previous(self, previous: PreviousTransformer):
         self._previous = previous
 
-    def signature(self) -> Signature:
+    def signature(self) -> inspect.Signature:
         return self._signature(type(self))
 
-    def _signature(self, klass: Type) -> Signature:
+    def _signature(self, klass: Type) -> inspect.Signature:
         orig_bases = getattr(self, "__orig_bases__", [])
         transformer_args = [get_args(base) for base in orig_bases if get_origin(base) == klass]
 

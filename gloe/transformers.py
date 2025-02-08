@@ -19,9 +19,9 @@ O5 = TypeVar("O5")
 O6 = TypeVar("O6")
 O7 = TypeVar("O7")
 
-Tr: TypeAlias = "Transformer"
-AT: TypeAlias = "AsyncTransformer"
-BT: TypeAlias = "BaseTransformer[I, O, Any]"
+Tr = TypeAlias("Transformer")
+AT = TypeAlias("AsyncTransformer")
+BT = TypeAlias("BaseTransformer[I, O, Any]")
 
 AsyncNext2 = Union[
     tuple[AT[O, O1], BT[O, O2]],
@@ -121,7 +121,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
                     transformer_frame = transformer_frames[0]
                     exception_message = (
                         f"\n  "
-                        f'File "{transformer_frame.filename}", line {transformer_frame.lineno}, ' 
+                        f'File "{transformer_frame.filename}", line {transformer_frame.lineno}, '  
                         f'in transformer "{self.__class__.__name__}"\n  "
                         f"  >> {transformer_frame.line}"
                     )

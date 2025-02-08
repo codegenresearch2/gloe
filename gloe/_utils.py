@@ -1,4 +1,4 @@
-from typing import TypeVar, GenericAlias
+from typing import TypeVar, GenericAlias, get_origin, Union
 
 _T = TypeVar('_T')
 

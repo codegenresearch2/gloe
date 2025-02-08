@@ -1,1 +1,1 @@
-from typing import Callable, TypeVar, ParamSpec, Awaitable, Generic, Union, get_origin, _GenericAlias\\"import asyncio\\"
+from typing import Callable, TypeVar, ParamSpec, Awaitable, Generic, Union, get_origin, _GenericAlias"

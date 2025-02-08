@@ -13,14 +13,18 @@ _In = TypeVar("_In")
 _Out = TypeVar("_Out")
 _NextOut = TypeVar("_NextOut")
 
+
 def is_transformer(node):
     return isinstance(node, Transformer)
+
 
 def is_async_transformer(node):
     return isinstance(node, AsyncTransformer)
 
+
 def has_any_async_transformer(node):
     return any(is_async_transformer(n) for n in node)
+
 
 def _resolve_new_merge_transformers(new_transformer, transformer2):
     new_transformer.__class__.__name__ = transformer2.__class__.__name__
@@ -30,6 +34,7 @@ def _resolve_new_merge_transformers(new_transformer, transformer2):
     new_transformer._graph_node_props = transformer2.graph_node_props
     new_transformer._set_previous(transformer2.previous)
     return new_transformer
+
 
 def _resolve_serial_connection_signatures(transformer2, generic_vars, signature2):
     first_param = list(signature2.parameters.values())[0]
@@ -41,6 +46,7 @@ def _resolve_serial_connection_signatures(transformer2, generic_vars, signature2
         return_annotation=_specify_types(signature2.return_annotation, generic_vars)
     )
     return new_signature
+
 
 def _nerge_serial(transformer1, transformer2):
     if transformer1.previous is None:
@@ -56,7 +62,7 @@ def _nerge_serial(transformer1, transformer2):
     output_generic_vars = _match_types(signature1.return_annotation, transformer2.input_type)
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
-    def transformer1_signature(_) -> Signature:
+    def transformer1_signature(_):
         return signature1.replace(
             return_annotation=_specify_types(signature1.return_annotation, generic_vars)
         )
@@ -118,6 +124,7 @@ def _nerge_serial(transformer1, transformer2):
         raise UnsupportedTransformerArgException(transformer2)
 
     return _resolve_new_merge_transformers(new_transformer, transformer2)
+
 
 def _merge_diverging(incident_transformer, *receiving_transformers):
     if incident_transformer.previous is None:
@@ -203,6 +210,7 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
     }
 
     return new_transformer
+
 
 def _compose_nodes(current, next_node):
     if issubclass(type(current), BaseTransformer):

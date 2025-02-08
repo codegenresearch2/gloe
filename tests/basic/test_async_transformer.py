@@ -1,20 +1,13 @@
 import asyncio
 import unittest
 from typing import TypeVar, Any, cast
-
-from gloe import (
-    async_transformer,
-    ensure,
-    UnsupportedTransformerArgException,
-    transformer,
-    AsyncTransformer,
-    TransformerException,
-)
+from gloe import (async_transformer, ensure, UnsupportedTransformerArgException, transformer, AsyncTransformer, TransformerException)
 from gloe.async_transformer import _execute_async_flow
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
-from tests.lib.exceptions import LnOfNegativeNumber
-from tests.lib.transformers import async_plus1, async_natural_logarithm
+from tests.lib.ensurers import is_odd
+from tests.lib.exceptions import LnOfNegativeNumber, NumbersEqual, NumberIsEven
+from tests.lib.transformers import async_plus1, async_natural_logarithm, minus1
 
 _In = TypeVar("_In")
 
@@ -108,10 +101,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((_URL, _DATA), result)
 
     async def test_divergent_connection_from_async(self):
-        test_forward = request_data >> (
-            forward[dict[str, str]](),
-            forward[dict[str, str]](),
-        )
+        test_forward = request_data >> (forward[dict[str, str]](), forward[dict[str, str]]())
 
         result = await test_forward(_URL)
 
@@ -163,18 +153,14 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")
 
         class_request_data = RequestData()
-        self.assertEqual(
-            repr(class_request_data), "str -> (RequestData) -> dict[str, str]"
-        )
+        self.assertEqual(repr(class_request_data), "str -> (RequestData) -> dict[str, str]")
 
         @transformer
         def dict_to_str(_dict: dict) -> str:
             return str(_dict)
 
         request_and_serialize = request_data >> dict_to_str
-        self.assertEqual(
-            repr(request_and_serialize), "dict -> (2 transformers omitted) -> str"
-        )
+        self.assertEqual(repr(request_and_serialize), "dict -> (2 transformers omitted) -> str")
 
     async def test_exhausting_large_flow(self):
         """
@@ -201,7 +187,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         except LnOfNegativeNumber as exception:
             self.assertEqual(type(exception.__cause__), TransformerException)
 
-            exception_ctx = cast(TransformerException, exception.__cause__)
+                exception_ctx = cast(TransformerException, exception.__cause__)
             self.assertEqual(async_natural_logarithm, exception_ctx.raiser_transformer)
 
     async def test_execute_async_wrong_flow(self):

@@ -1,6 +1,6 @@
 import asyncio
 import unittest
-from typing import TypeVar
+from typing import TypeVar, Any
 from gloe import async_transformer, ensure
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
@@ -12,10 +12,9 @@ _DATA = {'foo': 'bar'}
 class HasNotBarKey(Exception):
     pass
 
-async def is_string(data: _In) -> _In:
-    if not isinstance(data, str):
+async def has_bar_key(data: dict[str, str]) -> None:
+    if 'bar' not in data:
         raise HasNotBarKey()
-    return data
 
 _URL = 'http://my-service'
 
@@ -66,7 +65,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(outcome=[is_string], incoming=[is_string])
+        @ensure(outcome=[has_bar_key], incoming=[has_bar_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -78,7 +77,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(outcome=[is_string], incoming=[is_string])
+        @ensure(outcome=[has_bar_key], incoming=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)

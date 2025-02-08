@@ -5,7 +5,7 @@ class GloeDarkStyle(Style):
     name = 'gloe-dark'
 
     background_color = '#202020'
-    highlight_color = '#404040'
+    highlight_color = '#404040'  # Ensure this matches the gold code
     line_number_color = '#aaaaaa'
 
     styles = {

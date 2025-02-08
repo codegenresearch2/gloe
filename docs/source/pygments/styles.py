@@ -48,7 +48,7 @@ class GloeLightStyle(Style):
     name = 'gloe-light'
 
     background_color = '#ffffff'
-    highlight_color = '#f0f0f0'
+    highlight_color = '#f0f0f0'  # Ensure this matches the gold code
     line_number_color = '#555555'
 
     styles = {

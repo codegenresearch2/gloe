@@ -150,10 +150,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(str(signature), "(url: str) -> dict[str, str]")
 
     def test_async_transformer_representation(self):
-        self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")
+        self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")        
 
         class_request_data = RequestData()
-        self.assertEqual(repr(class_request_data), "str -> (RequestData) -> dict[str, str]")
+        self.assertEqual(repr(class_request_data), "str -> (RequestData) -> dict[str, str]")        
 
         @transformer
         def dict_to_str(_dict: dict) -> str:

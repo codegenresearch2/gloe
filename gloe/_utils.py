@@ -1,1 +1,1 @@
-from typing import Callable, TypeVar, ParamSpec, Awaitable, Generic, Union, get_origin, _GenericAlias\\\"import asyncio\\\\n_Args = ParamSpec('_Args')\\\\_R = TypeVar('_R')\\\\\"def awaitify(sync_func: Callable[_Args, _R]) -> Callable[_Args, Awaitable[_R]]:\\\\n    async def async_func(*args, **kwargs):\\\\n        return sync_func(*args, **kwargs)\\\\\\\n    return async_func
+from typing import Callable, TypeVar, ParamSpec, Awaitable, Generic, Union, get_origin, _GenericAlias\nimport asyncio\n\n_Args = ParamSpec('_Args')\\_R = TypeVar('_R')\\

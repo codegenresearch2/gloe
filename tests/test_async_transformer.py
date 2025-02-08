@@ -55,6 +55,16 @@ def add_foo_key(data: dict[str, str]) -> dict[str, str]:
     data['foo'] = 'bar'
     return data
 
+@transformer
+def is_int(data: Any) -> None:
+    if not isinstance(data, int):
+        raise IsNotInt()
+
+@transformer
+def is_str(data: Any) -> None:
+    if not isinstance(data, str):
+        raise IsNotStr()
+
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
         test_forward = request_data >> forward()

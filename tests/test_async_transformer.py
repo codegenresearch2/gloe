@@ -12,7 +12,7 @@ _DATA = {'foo': 'bar'}
 class HasNotBarKey(Exception):
     pass
 
-async def has_bar_key(data: dict[str, str]) -> None:
+def has_bar_key(data: dict[str, str]) -> None:
     if 'bar' not in data:
         raise HasNotBarKey()
 

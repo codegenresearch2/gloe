@@ -1,1 +1,1 @@
-def add(a: int, b: int) -> int:"""Returns the sum of two integers."""\"""\\\\n    return a + b\\"""\"
+from typing import Callable, TypeVar\\\\\n\\\nParamSpec = TypeVar('ParamSpec')\\\nReturnType = TypeVar('ReturnType')\\\n\\\ndef add(a: int, b: int) -> int:\\\n    """Returns the sum of two integers."""\\\n    return a + b

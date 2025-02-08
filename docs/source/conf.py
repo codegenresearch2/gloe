@@ -72,4 +72,4 @@ html_theme_options = {
         {
             'name': 'GitHub',
             'url': 'https://github.com/ideos/gloe',
-            'html': '\n                <svg stroke=\
+            'html': '\n                <svg stroke=\n

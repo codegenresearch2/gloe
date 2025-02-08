@@ -14,19 +14,19 @@ _Out = TypeVar('_Out')
 _NextOut = TypeVar('_NextOut')
 
 
-def is_transformer(node):
+def is_transformer(node: Any) -> bool:
     return isinstance(node, Transformer)
 
 
-def is_async_transformer(node):
+def is_async_transformer(node: Any) -> bool:
     return isinstance(node, AsyncTransformer)
 
 
-def has_any_async_transformer(node):
+def has_any_async_transformer(node: list) -> bool:
     return any(is_async_transformer(n) for n in node)
 
 
-def _resolve_new_merge_transformers(new_transformer, transformer2):
+def _resolve_new_merge_transformers(new_transformer: BaseTransformer, transformer2: BaseTransformer) -> BaseTransformer:
     new_transformer.__class__.__name__ = transformer2.__class__.__name__
     new_transformer._label = transformer2.label
     new_transformer._children = transformer2.children
@@ -36,7 +36,7 @@ def _resolve_new_merge_transformers(new_transformer, transformer2):
     return new_transformer
 
 
-def _resolve_serial_connection_signatures(transformer2, generic_vars, signature2):
+def _resolve_serial_connection_signatures(transformer2: BaseTransformer, generic_vars: dict, signature2: Signature) -> Signature:
     first_param = list(signature2.parameters.values())[0]
     new_parameter = first_param.replace(
         annotation=_specify_types(transformer2.input_type, generic_vars)
@@ -48,7 +48,7 @@ def _resolve_serial_connection_signatures(transformer2, generic_vars, signature2
     return new_signature
 
 
-def _nerge_serial(transformer1, transformer2):
+def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) -> BaseTransformer:
     if transformer1.previous is None:
         transformer1 = transformer1.copy(regenerate_instance_id=True)
 
@@ -62,7 +62,7 @@ def _nerge_serial(transformer1, transformer2):
     output_generic_vars = _match_types(signature1.return_annotation, transformer2.input_type)
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
-    def transformer1_signature(_):
+    def transformer1_signature(self: Any) -> Signature:
         return signature1.replace(
             return_annotation=_specify_types(signature1.return_annotation, generic_vars)
         )
@@ -74,10 +74,10 @@ def _nerge_serial(transformer1, transformer2):
     )
 
     class BaseNewTransformer:
-        def signature() -> Signature:
+        def signature(self: Any) -> Signature:
             return _resolve_serial_connection_signatures(transformer2, generic_vars, signature2)
 
-        def __len__():
+        def __len__(self: Any) -> int:
             return len(transformer1) + len(transformer2)
 
     new_transformer = None
@@ -126,7 +126,7 @@ def _nerge_serial(transformer1, transformer2):
     return _resolve_new_merge_transformers(new_transformer, transformer2)
 
 
-def _merge_diverging(incident_transformer, *receiving_transformers):
+def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transformers: BaseTransformer) -> BaseTransformer:
     if incident_transformer.previous is None:
         incident_transformer = incident_transformer.copy(regenerate_instance_id=True)
 
@@ -153,14 +153,14 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
             )
 
     class BaseNewTransformer:
-        def signature() -> Signature:
+        def signature(self: Any) -> Signature:
             receiving_signature_returns = [r.return_annotation for r in receiving_signatures]
             new_signature = incident_signature.replace(
                 return_annotation=GenericAlias(tuple, tuple(receiving_signature_returns))
             )
             return new_signature
 
-        def __len__():
+        def __len__(self: Any) -> int:
             lengths = [len(t) for t in receiving_transformers]
             return sum(lengths) + len(incident_transformer)
 
@@ -209,7 +209,7 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
     return new_transformer
 
 
-def _compose_nodes(current, next_node):
+def _compose_nodes(current: BaseTransformer, next_node: BaseTransformer | tuple) -> BaseTransformer:
     if issubclass(type(current), BaseTransformer):
         if issubclass(type(next_node), BaseTransformer):
             return _nerge_serial(current, next_node)  # type: ignore

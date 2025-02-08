@@ -1,1 +1,1 @@
-import os\"nimport sys\"n\"# Configuration file for the Sphinx documentation builder.\"n# This file is structured to align with the gold code's suggestions.\"n\"".replace('\n', '').replace('\r', '') + 
+import os"

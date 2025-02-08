@@ -2,7 +2,7 @@ import copy
 import types
 import uuid
 from inspect import Signature
-from typing import Any, Callable, Generic, TypeVar, Union, Iterable, get_args, get_origin, TypeAlias
+from typing import Any, Callable, Generic, TypeVar, Union, Iterable, get_args, get_origin, TypeAlias, Type
 from uuid import UUID
 from itertools import groupby
 from functools import cached_property
@@ -177,8 +177,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             nx.set_node_attributes(net, {node_id: props})
         return node_id
 
-    def _add_child_node(
-        self,
+    def _add_child_node(self,
         child: "BaseTransformer",
         child_net: DiGraph,
         parent_id: str,

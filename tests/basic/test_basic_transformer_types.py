@@ -71,6 +71,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph, Transformer[float, tuple[float, float]])
 
     def test_async_transformer(self):
+        @async_transformer
         async def _square(num: int) -> float:
             return float(num * num)
 

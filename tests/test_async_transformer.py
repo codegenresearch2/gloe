@@ -161,4 +161,3 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = pipeline.copy()
         result = await pipeline(_URL)
         self.assertEqual(result, _DATA)
-}

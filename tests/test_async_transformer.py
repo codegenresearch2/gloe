@@ -4,6 +4,7 @@ from typing import TypeVar, Any
 from gloe import async_transformer, ensure
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
+from gloe import UnsupportedTransformerArgException
 
 _In = TypeVar('_In')
 
@@ -11,6 +12,13 @@ _DATA = {'foo': 'bar'}
 
 class HasNotBarKey(Exception):
     pass
+
+class IsString(Exception):
+    pass
+
+def is_string(value: Any) -> None:
+    if not isinstance(value, str):
+        raise IsString()
 
 def has_bar_key(data: dict[str, str]) -> None:
     if 'bar' not in data:
@@ -87,3 +95,52 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
+
+    async def test_unsupported_transformer_argument(self):
+        def just_a_normal_function():
+            return None
+
+        with self.assertRaises(
+            UnsupportedTransformerArgException,
+            msg=f"Unsupported transformer argument: {just_a_normal_function}",
+        ):
+            _ = square >> just_a_normal_function  # type: ignore
+
+        with self.assertRaises(
+            UnsupportedTransformerArgException,
+            msg=f"Unsupported transformer argument: {just_a_normal_function}",
+        ):
+            _ = square >> (just_a_normal_function, plus1)  # type: ignore
+
+    async def test_transformer_copying(self):
+        graph = square >> square_root
+        copied_graph = graph.copy()
+
+        self.assertEqual(graph, copied_graph)
+
+    async def test_transformer_equality(self):
+        graph = square >> square_root
+        self.assertEqual(square, square)
+        self.assertEqual(square, square.copy())
+        self.assertNotEqual(graph, square_root)
+        self.assertNotEqual(square, square_root)
+
+    async def test_transformer_pydoc_keeping(self):
+        @transformer
+        def to_string(num: int) -> str:
+            """
+            This transformer receives a number as input and return its representation as a string
+            """
+            return str(num)
+
+        self.assertEqual(
+            to_string.__doc__,
+            """
+            This transformer receives a number as input and return its representation as a string
+            """
+        )
+
+    async def test_transformer_signature_representation(self):
+        signature = square.signature()
+
+        self.assertEqual(str(signature), '(num: float) -> float')

@@ -11,14 +11,12 @@ from tests.type_utils.mypy_test_suite import MypyTestSuite
 In = TypeVar("In")
 Out = TypeVar("Out")
 
-
 class TestBasicTransformerTypes(MypyTestSuite):
 
     def test_transformer_simple_typing(self):
         """
         Test the most simple transformer typing
         """
-
         graph = square
         assert_type(graph, Transformer[float, float])
 
@@ -26,25 +24,20 @@ class TestBasicTransformerTypes(MypyTestSuite):
         """
         Test the most simple transformer typing
         """
-
         graph = square >> square_root
-
         assert_type(graph, Transformer[float, float])
 
     def test_flow_with_mixed_types(self):
         """
         Test the most simple transformer typing
         """
-
         graph = square >> square_root >> to_string
-
         assert_type(graph, Transformer[float, str])
 
     def test_divergent_flow_types(self):
         """
         Test the most simple transformer typing
         """
-
         graph2 = square >> square_root >> (to_string, square)
         assert_type(graph2, Transformer[float, tuple[str, float]])
 
@@ -65,9 +58,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
 
     def test_bridge(self):
         num_bridge = bridge[float]("num")
-
         graph = plus1 >> num_bridge.pick() >> minus1 >> num_bridge.drop()
-
         assert_type(graph, Transformer[float, tuple[float, float]])
 
     def test_async_transformer(self):

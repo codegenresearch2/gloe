@@ -1,5 +1,8 @@
-from types import GenericAlias
-from typing import TypeVar, get_origin, TypeAlias, TypedDict, Generic, Union, get_args, issubclass, _GenericAlias
+from typing import TypeVar, get_origin, TypeAlias, TypedDict, Generic, Union, get_args
+
+# type: ignore
+
+_T = TypeVar('_T')
 
 
 def _format_tuple(
@@ -10,9 +13,13 @@ def _format_tuple(
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
-            _format_return_annotation(annotation, generic_input_param, input_annotation)
+            _format_return_annotation(
+                annotation,
+                generic_input_param,
+                input_annotation,
+            )
         )
-    return f"({', '.join(formatted)})"
+    return f'({', '.join(formatted)})'
 
 
 def _format_union(
@@ -23,9 +30,13 @@ def _format_union(
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
-            _format_return_annotation(annotation, generic_input_param, input_annotation)
+            _format_return_annotation(
+                annotation,
+                generic_input_param,
+                input_annotation,
+            )
         )
-    return f"({' | '.join(formatted)})"
+    return f'({' | '.join(formatted)})'
 
 
 def _format_generic_alias(
@@ -37,9 +48,13 @@ def _format_generic_alias(
     formatted: list[str] = []
     for annotation in return_annotation.__args__:
         formatted.append(
-            _format_return_annotation(annotation, generic_input_param, input_annotation)
+            _format_return_annotation(
+                annotation,
+                generic_input_param,
+                input_annotation,
+            )
         )
-    return f"{alias_name}[{', '.join(formatted)}]"
+    return f'{alias_name}[{', '.join(formatted)}]'
 
 
 def _format_return_annotation(
@@ -49,14 +64,14 @@ def _format_return_annotation(
 ) -> str:
     if isinstance(return_annotation, str):
         return return_annotation
-    if isinstance(return_annotation, tuple):
+    if type(return_annotation) == tuple:
         return _format_tuple(return_annotation, generic_input_param, input_annotation)
-    if return_annotation.__name__ in {"tuple", "Tuple"}:
+    if return_annotation.__name__ in {'tuple', 'Tuple'}:
         return _format_tuple(
             return_annotation.__args__,
             generic_input_param, input_annotation
         )
-    if return_annotation.__name__ in {"Union"}:
+    if return_annotation.__name__ in {'Union'}:
         return _format_union(
             return_annotation.__args__,
             generic_input_param, input_annotation

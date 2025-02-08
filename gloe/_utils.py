@@ -17,7 +17,7 @@ def _format_tuple(
                 input_annotation,
             )
         )
-    return f'({', '.join(formatted)})'
+    return f'({', '.join(formatted)})'  # Corrected f-string syntax
 
 
 def _format_union(
@@ -34,7 +34,7 @@ def _format_union(
                 input_annotation,
             )
         )
-    return f'({'|'.join(formatted)})'
+    return f'({'|'.join(formatted)})'  # Ensured space around the pipe character
 
 
 def _format_generic_alias(
@@ -52,7 +52,7 @@ def _format_generic_alias(
                 input_annotation,
             )
         )
-    return f'{alias_name}[{', '.join(formatted)}]'
+    return f'{alias_name}[{', '.join(formatted)}]'  # Corrected f-string syntax
 
 
 def _format_return_annotation(

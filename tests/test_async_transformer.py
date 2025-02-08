@@ -6,6 +6,7 @@ from gloe.functional import partial_async_transformer
 from gloe.utils import forward
 
 _In = TypeVar('_In')
+_Out = TypeVar('_Out')
 
 _DATA = {'foo': 'bar'}
 

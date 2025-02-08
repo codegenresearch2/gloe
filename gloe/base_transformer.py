@@ -1,11 +1,11 @@
 import copy
 import types
 import uuid
-from inspect import Signature
+import inspect
+from functools import cached_property
 from typing import Any, Callable, Generic, TypeVar, Union, Iterable, get_args, get_origin, TypeAlias, Type
 from uuid import UUID
 from itertools import groupby
-from functools import cached_property
 
 from gloe._utils import _format_return_annotation
 import networkx as nx
@@ -178,12 +178,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             nx.set_node_attributes(net, {node_id: props})
         return node_id
 
-    def _add_child_node(self,
-        child: "BaseTransformer",
-        child_net: nx.DiGraph,
-        parent_id: str,
-        next_node: "BaseTransformer",
-    ):
+    def _add_child_node(self, child: "BaseTransformer", child_net: nx.DiGraph, parent_id: str, next_node: "BaseTransformer"):
         child._dag(child_net, next_node, custom_data={"parent_id": parent_id})
 
     @property

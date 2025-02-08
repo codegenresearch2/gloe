@@ -9,9 +9,9 @@ from tests.lib.ensurers import is_odd
 from tests.lib.exceptions import LnOfNegativeNumber, NumbersEqual, NumberIsEven
 from tests.lib.transformers import async_plus1, async_natural_logarithm, minus1
 
-_In = TypeVar("_In")
+_In = TypeVar('_In')
 
-_DATA = {"foo": "bar"}
+_DATA = {'foo': 'bar'}
 
 
 async def raise_an_error():
@@ -48,12 +48,12 @@ class IsNotInt(Exception):
 
 
 def has_bar_key(data: dict[str, str]):
-    if "bar" not in data.keys():
+    if 'bar' not in data.keys():
         raise HasNotBarKey()
 
 
 def has_foo_key(data: dict[str, str]):
-    if "foo" not in data.keys():
+    if 'foo' not in data.keys():
         raise HasNotBarKey()
 
 
@@ -64,18 +64,18 @@ def is_int(data: Any):
 
 def is_str(data: Any):
     if type(data) is not str:
-        raise Exception("data is not string")
+        raise Exception('data is not string')
 
 
 def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
-    if "foo" not in incoming.keys():
+    if 'foo' not in incoming.keys():
         raise HasNotFooKey()
 
-    if "foo" in outcome.keys():
+    if 'foo' in outcome.keys():
         raise HasFooKey()
 
 
-_URL = "http://my-service"
+_URL = 'http://my-service'
 
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
@@ -123,7 +123,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_async_transformer_copy(self):
         @transformer
         def add_slash(path: str) -> str:
-            return path + "/"
+            return path + '/'
 
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
@@ -147,20 +147,20 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     def test_async_transformer_signature_representation(self):
         signature = request_data.signature()
 
-        self.assertEqual(str(signature), "(url: str) -> dict[str, str]")
+        self.assertEqual(str(signature), '(url: str) -> dict[str, str]')
 
     def test_async_transformer_representation(self):
-        self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")        
+        self.assertEqual(repr(request_data), 'str -> (request_data) -> dict[str, str]')
 
         class_request_data = RequestData()
-        self.assertEqual(repr(class_request_data), "str -> (RequestData) -> dict[str, str]")        
+        self.assertEqual(repr(class_request_data), 'str -> (RequestData) -> dict[str, str]')
 
         @transformer
         def dict_to_str(_dict: dict) -> str:
             return str(_dict)
 
         request_and_serialize = request_data >> dict_to_str
-        self.assertEqual(repr(request_and_serialize), "dict -> (2 transformers omitted) -> str")
+        self.assertEqual(repr(request_and_serialize), 'dict -> (2 transformers omitted) -> str')
 
     async def test_exhausting_large_flow(self):
         """

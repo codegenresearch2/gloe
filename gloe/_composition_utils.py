@@ -62,7 +62,7 @@ def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) 
     output_generic_vars = _match_types(signature1.return_annotation, transformer2.input_type)
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
-    def transformer1_signature(_):
+    def transformer1_signature(self: Any) -> Signature:
         return signature1.replace(
             return_annotation=_specify_types(signature1.return_annotation, generic_vars)
         )
@@ -74,10 +74,10 @@ def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) 
     )
 
     class BaseNewTransformer:
-        def signature() -> Signature:
+        def signature(self: Any) -> Signature:
             return _resolve_serial_connection_signatures(transformer2, generic_vars, signature2)
 
-        def __len__() -> int:
+        def __len__(self: Any) -> int:
             return len(transformer1) + len(transformer2)
 
     new_transformer = None
@@ -160,7 +160,7 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
             )
             return new_signature
 
-        def __len__() -> int:
+        def __len__(self: Any) -> int:
             lengths = [len(t) for t in receiving_transformers]
             return sum(lengths) + len(incident_transformer)
 

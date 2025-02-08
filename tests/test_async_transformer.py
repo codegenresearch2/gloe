@@ -57,12 +57,12 @@ def add_foo_key(data: dict[str, str]) -> dict[str, str]:
 
 @transformer
 def is_int(data: Any) -> None:
-    if not isinstance(data, int):
+    if type(data) is not int:
         raise IsNotInt()
 
 @transformer
 def is_str(data: Any) -> None:
-    if not isinstance(data, str):
+    if type(data) is not str:
         raise IsNotStr()
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):

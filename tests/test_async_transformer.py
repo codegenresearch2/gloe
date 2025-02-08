@@ -36,8 +36,8 @@ async def request_data_with_delay(url: str, delay: float) -> dict[str, str]:
     await asyncio.sleep(delay)
     return _DATA
 
-def has_foo_key(dict: dict[str, str]) -> None:
-    if 'foo' not in dict.keys():
+def has_foo_key(data: dict[str, str]) -> None:
+    if 'foo' not in data.keys():
         raise HasNotFooKey()
 
 @transformer
@@ -46,14 +46,16 @@ def add_slash(path: str) -> str:
 
 @transformer
 def remove_foo_key(data: dict[str, str]) -> dict[str, str]:
-    if 'foo' in data:
-        del data['foo']
-    return data
+    new_data = data.copy()
+    if 'foo' in new_data:
+        del new_data['foo']
+    return new_data
 
 @transformer
 def add_foo_key(data: dict[str, str]) -> dict[str, str]:
-    data['foo'] = 'bar'
-    return data
+    new_data = data.copy()
+    new_data['foo'] = 'bar'
+    return new_data
 
 @transformer
 def is_int(data: Any) -> None:

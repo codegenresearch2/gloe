@@ -121,7 +121,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
                     transformer_frame = transformer_frames[0]
                     exception_message = (
                         f"\n  "
-                        f'File "{transformer_frame.filename}", line {transformer_frame.lineno}, ' 
+                        f'File "{transformer_frame.filename}", line {transformer_frame.lineno}, '  
                         f'in transformer "{self.__class__.__name__}"\n  "
                         f"  >> {transformer_frame.line}"
                     )

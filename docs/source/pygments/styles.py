@@ -1,10 +1,11 @@
 from pygments.style import Style
-from pygments.token import (
-    Keyword, Name, Comment, String, Error, Number, Operator, Generic, Token, Whitespace
-)
+from pygments.token import (Keyword, Name, Comment, String, Error, Number, Operator, Generic, Token, Whitespace)
 
-class GloeStyle(Style):
-    name = 'GloeStyle'
+class GloeDarkStyle(Style):
+    name = 'GloeDarkStyle'
+    background_color = '#202020'
+    highlight_color = '#404040'
+    line_number_color = '#aaaaaa'
 
     styles = {
         Token: '#d0d0d0',
@@ -13,7 +14,10 @@ class GloeStyle(Style):
         Comment.Preproc: 'noitalic bold #ff3a3a',
         Comment.Special: 'noitalic bold #e50808 bg:#520000',
         Keyword: 'bold #45df9a',
+        Keyword.Pseudo: 'nobold',
+        Operator.Word: 'bold #45df9a',
         String: '#6ad7ca',
+        String.Other: '#6ad7ca',
         Number: '#51b2fd',
         Name.Builtin: '#2fbccd',
         Name.Variable: '#40ffff',
@@ -23,6 +27,7 @@ class GloeStyle(Style):
         Name.Exception: '#bbbbbb',
         Name.Tag: 'bold #45df9a',
         Name.Attribute: '#bbbbbb',
+        Name.Decorator: '#6ad7ca',
         Generic.Heading: 'bold #ffffff',
         Generic.Subheading: 'underline #ffffff',
         Generic.Deleted: '#ff3a3a',

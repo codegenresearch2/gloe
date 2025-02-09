@@ -2,7 +2,7 @@ from pygments.style import Style
 from pygments.token import (Keyword, Name, Comment, String, Error, Number, Operator, Generic, Token, Whitespace)
 
 class GloeDarkStyle(Style):
-    name = 'GloeDarkStyle'
+    name = 'gloe-dark-style'
     background_color = '#202020'
     highlight_color = '#404040'
     line_number_color = '#aaaaaa'
@@ -39,5 +39,6 @@ class GloeDarkStyle(Style):
         Generic.Prompt: '#aaaaaa',
         Generic.Output: '#cccccc',
         Generic.Traceback: '#ff3a3a',
-        Error: 'bg:#e3d2d2 #a61717'
+        Error: 'bg:#e3d2d2 #a61717',
+        Name.Constant: '#ff0000'  # Added Name.Constant with a color
     }

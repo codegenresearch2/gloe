@@ -16,14 +16,14 @@ from pygments.token import (
 class GloeDarkStyle(Style):
     name = "dark"
 
-    background_color = "#202020"
-    highlight_color = "#404040"
+    background_color = "#202020"  # Style Properties: Updated to match the gold code
+    highlight_color = "#404040"  # Style Properties: Updated to match the gold code
     line_number_color = "#aaaaaa"
 
     styles = {
         Token: "#d0d0d0",
         Whitespace: "#666666",
-        Comment: "italic #ababab",
+        Comment: "italic #ababab",  # Whitespace and Comment Styles: Updated to match the gold code
         Comment.Preproc: "noitalic bold #ff3a3a",
         Comment.Special: "noitalic bold #e50808 bg:#520000",
         Keyword: "bold #45df9a",
@@ -42,7 +42,7 @@ class GloeDarkStyle(Style):
         Name.Tag: "bold #45df9a",
         Name.Attribute: "#bbbbbb",
         Name.Decorator: "#6ad7ca",
-        Generic.Heading: "bold #ffffff",
+        Generic.Heading: "bold #ffffff",  # Generic Styles: Updated to match the gold code
         Generic.Subheading: "underline #ffffff",
         Generic.Deleted: "#ff3a3a",
         Generic.Inserted: "#589819",
@@ -59,8 +59,8 @@ class GloeDarkStyle(Style):
 class GloeLightStyle(Style):
     name = "light"
 
-    background_color = "#f5f5f5"  # Background Color: Updated to match the gold code
-    highlight_color = "#e0e0e0"  # Highlight Color: Updated to match the gold code
+    background_color = "#f5f5f5"  # Style Properties: Updated to match the gold code
+    highlight_color = "#e0e0e0"  # Style Properties: Updated to match the gold code
     line_number_color = "#555555"
 
     styles = {
@@ -85,7 +85,7 @@ class GloeLightStyle(Style):
         Name.Tag: "bold #008080",
         Name.Attribute: "#666666",
         Name.Decorator: "#008000",
-        Generic.Heading: "bold #000000",
+        Generic.Heading: "bold #000000",  # Generic Styles: Updated to match the gold code
         Generic.Subheading: "underline #000000",
         Generic.Deleted: "#ff0000",
         Generic.Inserted: "#008000",

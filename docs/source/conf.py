@@ -65,6 +65,8 @@ html_sidebars = {
 
 # Use the correct pygments styles as specified in the gold code
 pygments_style = "styles.GloeStyle"
+pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"
 
 # Include all relevant variables in light_css_variables
 light_css_variables = {
@@ -113,3 +115,11 @@ html_theme_options = {
         },
     ],
 }
+
+# Add OGP variables to match the gold code
+ogp_site_url = "https://gloe.ideos.com.br/"
+ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+
+# Add static path and CSS files to match the gold code
+html_static_path = ["_static"]
+html_css_files = ["theme_customs.css"]

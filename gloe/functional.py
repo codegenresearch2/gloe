@@ -15,16 +15,6 @@ from typing import (
 from gloe.async_transformer import AsyncTransformer
 from gloe.transformers import Transformer
 
-__all__ = [
-    "transformer",
-    "partial_transformer",
-    "async_transformer",
-    "partial_async_transformer",
-]
-
-A = TypeVar("A")
-S = TypeVar("S")
-S2 = TypeVar("S2")
 P1 = ParamSpec("P1")
 P2 = ParamSpec("P2")
 O = TypeVar("O")
@@ -58,8 +48,8 @@ def partial_transformer(
     func: Callable[Concatenate[A, P1], S]
 ) -> _PartialTransformer[A, P1, S]:
     """
-    This decorator let us create partial transformers, which are transformers that
-    allow for partial application of their arguments. This capability is particularly
+    This decorator allows for the creation of partial transformers, which are transformers
+    that allow for partial application of their arguments. This capability is particularly
     useful for creating configurable transformer instances where some arguments are preset
     enhancing modularity and reusability in data processing pipelines.
 
@@ -169,6 +159,10 @@ def partial_async_transformer(
 def transformer(func: Callable[[A], S]) -> Transformer[A, S]:
     """
     Convert a callable to an instance of the Transformer class.
+
+    See Also:
+        The most common usage is as a decorator. This example demonstrates how to use the
+        `@transformer` decorator to filter a list of users::
 
     Example:
         The most common use is as a decorator::

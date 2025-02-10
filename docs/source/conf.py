@@ -30,10 +30,7 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
 ]
-overloads_location = "bottom"
-napoleon_google_docstring = True
-autosectionlabel_prefix_document = True
-napoleon_use_rtype = False
+
 # intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 
 # -- Options for HTML output -------------------------------------------------
@@ -46,17 +43,28 @@ html_last_updated_fmt = ""
 # html_use_index = False  # Don't create index
 # html_domain_indices = False  # Don't need module indices
 # html_copy_source = False  # Don't need sources
+
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+
 html_sidebars = {
-    "Home": ["/"],
+    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html"]
 }
-# autodoc_default_options = {"ignore-module-all": True}
 
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
+
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
+    "light_css_variables": {
+        "color-brand-primary": "#00e6bf",
+        "color-brand-content": "#00e6bf",
+        "font-stack": "Roboto, sans-serif",
+        "font-stack--monospace": "Courier, monospace",
+        "font-size--normal": "Courier, monospace",
+    },
     "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
@@ -78,5 +86,67 @@ html_theme_options = {
     ],
 }
 
-# pygments_style = "styles.GloeStyle"
+# Pygments styles
+from pygments.style import Style
+from pygments.token import (
+    Keyword,
+    Name,
+    Comment,
+    String,
+    Error,
+    Number,
+    Operator,
+    Generic,
+    Token,
+    Whitespace,
+)
+
+class GloeStyle(Style):
+    name = "gloe-style"
+
+    background_color = "#202020"
+    highlight_color = "#404040"
+    line_number_color = "#aaaaaa"
+
+    styles = {
+        Token: "#d0d0d0",
+        Whitespace: "#666666",
+        Comment: "italic #ababab",
+        Comment.Preproc: "noitalic bold #ff3a3a",
+        Comment.Special: "noitalic bold #e50808 bg:#520000",
+        Keyword: "bold #45df9a",
+        Keyword.Pseudo: "nobold",
+        Operator.Word: "bold #45df9a",
+        String: "#6ad7ca",
+        String.Other: "#6ad7ca",
+        Number: "#51b2fd",
+        Name.Builtin: "#2fbccd",
+        Name.Variable: "#40ffff",
+        Name.Constant: "#40ffff",
+        Name.Class: "underline #14c8ef",
+        Name.Function: "#14c8ef",
+        Name.Namespace: "underline #14c8ef",
+        Name.Exception: "#bbbbbb",
+        Name.Tag: "bold #45df9a",
+        Name.Attribute: "#bbbbbb",
+        Name.Decorator: "#6ad7ca",
+        Generic.Heading: "bold #ffffff",
+        Generic.Subheading: "underline #ffffff",
+        Generic.Deleted: "#ff3a3a",
+        Generic.Inserted: "#589819",
+        Generic.Error: "#ff3a3a",
+        Generic.Emph: "italic",
+        Generic.Strong: "bold",
+        Generic.EmphStrong: "bold italic",
+        Generic.Prompt: "#aaaaaa",
+        Generic.Output: "#cccccc",
+        Generic.Traceback: "#ff3a3a",
+        Error: "bg:#e3d2d2 #a61717",
+    }
+
 pygments_dark_style = "GloeStyle"
+pygments_light_style = "GloeStyle"
+
+# Open Graph properties
+ogp_site_url = "https://gloe.ideos.com.br/"
+ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"

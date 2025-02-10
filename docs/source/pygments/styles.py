@@ -16,7 +16,6 @@ class GloeDarkStyle(Style):
     name = "GloeDarkStyle"
     background_color = "#202020"
     highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
 
     styles = {
         Token: "#d0d0d0",
@@ -58,7 +57,6 @@ class GloeLightStyle(Style):
     name = "GloeLightStyle"
     background_color = "#ffffff"
     highlight_color = "#f0f0f0"
-    line_number_color = "#555555"
 
     styles = {
         Token: "#333333",

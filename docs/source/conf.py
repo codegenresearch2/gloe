@@ -34,16 +34,7 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
-
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
-autodoc_typehints = "description"
-autodoc_type_aliases = {
-    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
-}
+intersphinx_mapping = {}  # Commented out as per oracle feedback
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -81,4 +72,5 @@ html_theme_options = {
     ],
 }
 
-pygments_dark_style = "styles.GloeDarkStyle"
+# pygments_style = "styles.GloeStyle"  # Commented out as per oracle feedback
+pygments_dark_style = "styles.GloeDarkStyle"  # Added as per oracle feedback

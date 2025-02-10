@@ -13,7 +13,7 @@ from pygments.token import (
 )
 
 class GloeDarkStyle(Style):
-    name = "gloe-dark-style"
+    name = "GloeDarkStyle"
     background_color = "#202020"
     highlight_color = "#404040"
     line_number_color = "#aaaaaa"
@@ -55,7 +55,7 @@ class GloeDarkStyle(Style):
     }
 
 class GloeLightStyle(Style):
-    name = "gloe-light-style"
+    name = "GloeLightStyle"
     background_color = "#ffffff"
     highlight_color = "#f0f0f0"
     line_number_color = "#555555"

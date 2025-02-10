@@ -1,12 +1,14 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#builtin-sphinx-configuration
 import os
 import sys
 from pygments.style import Style
 from pygments.token import Token, Whitespace, Comment, Keyword, Operator, String, Number, Name, Generic, Error
 
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("pygments"))
 
@@ -27,7 +29,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -39,6 +40,10 @@ napoleon_use_rtype = False
 intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -55,7 +60,7 @@ html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
-    "dark_css_variables": {
+    "light_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
@@ -159,5 +164,5 @@ class GloeDarkStyle(Style):
         Error: "bg:#e3d2d2 #a61717",
     }
 
-pygments_dark_style = "styles.GloeDarkStyle"
-pygments_light_style = "styles.GloeLightStyle"
+# pygments_style = "styles.GloeLightStyle"
+# pygments_dark_style = "styles.GloeDarkStyle"

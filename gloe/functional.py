@@ -24,17 +24,14 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
-S2 = TypeVar("S2")
-P1 = ParamSpec("P1")
-P2 = ParamSpec("P2")
-O = TypeVar("O")
+P = ParamSpec("P")
 
 
-class _PartialTransformer(Generic[A, P1, S]):
-    def __init__(self, func: Callable[Concatenate[A, P1], S]):
+class _PartialTransformer(Generic[A, P, S]):
+    def __init__(self, func: Callable[Concatenate[A, P], S]):
         self.func = func
 
-    def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> Transformer[A, S]:
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Transformer[A, S]:
         func = self.func
         func_signature = inspect.signature(func)
 
@@ -55,8 +52,8 @@ class _PartialTransformer(Generic[A, P1, S]):
 
 
 def partial_transformer(
-    func: Callable[Concatenate[A, P1], S]
-) -> _PartialTransformer[A, P1, S]:
+    func: Callable[Concatenate[A, P], S]
+) -> _PartialTransformer[A, P, S]:
     """
     This decorator allows us to create partial transformers, which are transformers that
     allow for partial application of their arguments. This capability is particularly
@@ -97,15 +94,15 @@ def partial_transformer(
     return _PartialTransformer(func)
 
 
-class _PartialAsyncTransformer(Generic[A, P1, S]):
-    def __init__(self, func: Callable[Concatenate[A, P1], Awaitable[S]]):
+class _PartialAsyncTransformer(Generic[A, P, S]):
+    def __init__(self, func: Callable[Concatenate[A, P], Awaitable[S]]):
         self.func = func
 
-    def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> AsyncTransformer[A, S]:
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> AsyncTransformer[A, S]:
         func = self.func
         func_signature = inspect.signature(func)
 
-        class LambdaTransformer(AsyncTransformer[A, S]):
+        class LambdaAsyncTransformer(AsyncTransformer[A, S]):
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
 
@@ -115,15 +112,15 @@ class _PartialAsyncTransformer(Generic[A, P1, S]):
             async def transform_async(self, data: A) -> S:
                 return await func(data, *args, **kwargs)
 
-        lambda_transformer = LambdaTransformer()
+        lambda_transformer = LambdaAsyncTransformer()
         lambda_transformer.__class__.__name__ = func.__name__
         lambda_transformer._label = func.__name__
         return lambda_transformer
 
 
 def partial_async_transformer(
-    func: Callable[Concatenate[A, P1], Awaitable[S]]
-) -> _PartialAsyncTransformer[A, P1, S]:
+    func: Callable[Concatenate[A, P], Awaitable[S]]
+) -> _PartialAsyncTransformer[A, P, S]:
     """
     This decorator enables us to create partial asynchronous transformers, which are
     transformers capable of partial argument application. Such functionality is invaluable

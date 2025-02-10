@@ -108,7 +108,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
 
-    async def test_unsupported_transformer_argument(self):
+    async def test_async_transformer_wrong_arg(self):
         def just_a_normal_function():
             return None
 

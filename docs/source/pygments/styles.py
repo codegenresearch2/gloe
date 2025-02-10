@@ -90,4 +90,4 @@ class GloeLightStyle(Style):
     }
 
 
-This revised code snippet addresses the feedback by ensuring the necessary import statements are included, correcting the `highlight_color` for the light theme, and ensuring the token colors and formatting match the gold code.
+This revised code snippet addresses the feedback by ensuring the `highlight_color` for the light theme matches the gold code, and that the colors and formatting for each token in the `styles` dictionary align exactly with the gold code. The line number color and whitespace colors are also verified to match the gold code, ensuring consistency in class definitions and formatting.

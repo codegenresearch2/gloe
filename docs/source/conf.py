@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.napoleon",
     # "sphinx.ext.intersphinx",  # Commented out in the gold code
     "sphinxext.opengraph",
+    # "sphinx_autodoc_typehints",  # Commented out in the gold code
     "myst_parser",
     "sphinx_copybutton",
 ]

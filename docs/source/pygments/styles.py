@@ -14,32 +14,32 @@ from pygments.token import (
 
 class GloeDarkStyle(Style):
     name = "GloeDarkStyle"
-    background_color = "#202020"
-    highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
+    background_color = "#282c34"
+    highlight_color = "#44475a"
+    line_number_color = "#abb2bf"
 
     styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #ababab",
-        Comment.Preproc: "noitalic bold #ff3a3a",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #45df9a",
+        Token: "#f8f8f2",
+        Whitespace: "#49483e",
+        Comment: "italic #5c6370",
+        Comment.Preproc: "noitalic bold #61afef",
+        Comment.Special: "noitalic bold #c678dd bg:#3e4452",
+        Keyword: "bold #e6c07b",
         Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #45df9a",
-        String: "#6ad7ca",
-        String.Other: "#6ad7ca",
-        Number: "#51b2fd",
-        Name.Builtin: "#2fbccd",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #14c8ef",
-        Name.Function: "#14c8ef",
-        Name.Namespace: "underline #14c8ef",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #45df9a",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#6ad7ca",
+        Operator.Word: "bold #e6c07b",
+        String: "#98c379",
+        String.Other: "#98c379",
+        Number: "#d19a66",
+        Name.Builtin: "#56b6c2",
+        Name.Variable: "#e06c75",
+        Name.Constant: "#d19a66",
+        Name.Class: "underline #56b6c2",
+        Name.Function: "#61afef",
+        Name.Namespace: "underline #61afef",
+        Name.Exception: "#abb2bf",
+        Name.Tag: "bold #e6c07b",
+        Name.Attribute: "#abb2bf",
+        Name.Decorator: "#98c379",
         Generic.Heading: "bold #ffffff",
         Generic.Subheading: "underline #ffffff",
         Generic.Deleted: "#ff3a3a",
@@ -48,16 +48,16 @@ class GloeDarkStyle(Style):
         Generic.Emph: "italic",
         Generic.Strong: "bold",
         Generic.EmphStrong: "bold italic",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
+        Generic.Prompt: "#abb2bf",
+        Generic.Output: "#f8f8f2",
         Generic.Traceback: "#ff3a3a",
         Error: "bg:#e3d2d2 #a61717",
     }
 
 class GloeLightStyle(Style):
     name = "GloeLightStyle"
-    background_color = "#ffffff"
-    highlight_color = "#f0f0f0"
+    background_color = "#fafafa"
+    highlight_color = "#e0e0e0"
     line_number_color = "#333333"
 
     styles = {

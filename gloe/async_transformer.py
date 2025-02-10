@@ -25,7 +25,6 @@ _Out5 = TypeVar("_Out5")
 _Out6 = TypeVar("_Out6")
 _Out7 = TypeVar("_Out7")
 
-
 class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
     def __init__(self):
         super().__init__()
@@ -99,7 +98,7 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         if type(transformed) is not None:
             return cast(_Out, transformed)
 
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
     def copy(
         self,
@@ -116,7 +115,6 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
             copied.instance_id = uuid.uuid4()
 
         if self.previous is not None:
-            # copy_next_previous = 'none' if copy_previous == 'first_previous' else copy_previous
             if type(self.previous) == tuple:
                 new_previous: list[BaseTransformer] = [
                     previous_transformer.copy() for previous_transformer in self.previous
@@ -214,4 +212,4 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         pass
 
     def __rshift__(self, next_node):
-        pass  # pragma: no cover
+        pass

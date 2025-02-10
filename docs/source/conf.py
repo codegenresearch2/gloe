@@ -27,7 +27,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
     "myst_parser",
     "sphinx_copybutton",
@@ -37,13 +37,16 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 templates_path = ["_templates"]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
 autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -51,7 +54,7 @@ autodoc_typehints = "description"
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
-html_sidebars = {
+html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
 html_static_path = ["_static"]
@@ -61,6 +64,13 @@ html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
     "light_css_variables": {
+        "color-brand-primary": "#00e6bf",
+        "color-brand-content": "#00e6bf",
+        "font-stack": "Roboto, sans-serif",
+        "font-stack--monospace": "Courier, monospace",
+        "font-size--normal": "Courier, monospace",
+    },
+    "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
@@ -82,87 +92,87 @@ html_theme_options = {
 }
 
 # Pygments style configuration
-class GloeLightStyle(Style):
-    name = "gloe-light"
-    background_color = "#ffffff"
-    highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
-    styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #ababab",
-        Comment.Preproc: "noitalic bold #ff3a3a",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #45df9a",
-        Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #45df9a",
-        String: "#6ad7ca",
-        String.Other: "#6ad7ca",
-        Number: "#51b2fd",
-        Name.Builtin: "#2fbccd",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #14c8ef",
-        Name.Function: "#14c8ef",
-        Name.Namespace: "underline #14c8ef",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #45df9a",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#6ad7ca",
-        Generic.Heading: "bold #ffffff",
-        Generic.Subheading: "underline #ffffff",
-        Generic.Deleted: "#ff3a3a",
-        Generic.Inserted: "#589819",
-        Generic.Error: "#ff3a3a",
-        Generic.Emph: "italic",
-        Generic.Strong: "bold",
-        Generic.EmphStrong: "bold italic",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
-        Generic.Traceback: "#ff3a3a",
-        Error: "bg:#e3d2d2 #a61717",
-    }
-
-class GloeDarkStyle(Style):
-    name = "gloe-dark"
-    background_color = "#202020"
-    highlight_color = "#404040"
-    line_number_color = "#aaaaaa"
-    styles = {
-        Token: "#d0d0d0",
-        Whitespace: "#666666",
-        Comment: "italic #ababab",
-        Comment.Preproc: "noitalic bold #ff3a3a",
-        Comment.Special: "noitalic bold #e50808 bg:#520000",
-        Keyword: "bold #45df9a",
-        Keyword.Pseudo: "nobold",
-        Operator.Word: "bold #45df9a",
-        String: "#6ad7ca",
-        String.Other: "#6ad7ca",
-        Number: "#51b2fd",
-        Name.Builtin: "#2fbccd",
-        Name.Variable: "#40ffff",
-        Name.Constant: "#40ffff",
-        Name.Class: "underline #14c8ef",
-        Name.Function: "#14c8ef",
-        Name.Namespace: "underline #14c8ef",
-        Name.Exception: "#bbbbbb",
-        Name.Tag: "bold #45df9a",
-        Name.Attribute: "#bbbbbb",
-        Name.Decorator: "#6ad7ca",
-        Generic.Heading: "bold #ffffff",
-        Generic.Subheading: "underline #ffffff",
-        Generic.Deleted: "#ff3a3a",
-        Generic.Inserted: "#589819",
-        Generic.Error: "#ff3a3a",
-        Generic.Emph: "italic",
-        Generic.Strong: "bold",
-        Generic.EmphStrong: "bold italic",
-        Generic.Prompt: "#aaaaaa",
-        Generic.Output: "#cccccc",
-        Generic.Traceback: "#ff3a3a",
-        Error: "bg:#e3d2d2 #a61717",
-    }
-
+# class GloeLightStyle(Style):
+#     name = "gloe-light"
+#     background_color = "#ffffff"
+#     highlight_color = "#404040"
+#     line_number_color = "#aaaaaa"
+#     styles = {
+#         Token: "#d0d0d0",
+#         Whitespace: "#666666",
+#         Comment: "italic #ababab",
+#         Comment.Preproc: "noitalic bold #ff3a3a",
+#         Comment.Special: "noitalic bold #e50808 bg:#520000",
+#         Keyword: "bold #45df9a",
+#         Keyword.Pseudo: "nobold",
+#         Operator.Word: "bold #45df9a",
+#         String: "#6ad7ca",
+#         String.Other: "#6ad7ca",
+#         Number: "#51b2fd",
+#         Name.Builtin: "#2fbccd",
+#         Name.Variable: "#40ffff",
+#         Name.Constant: "#40ffff",
+#         Name.Class: "underline #14c8ef",
+#         Name.Function: "#14c8ef",
+#         Name.Namespace: "underline #14c8ef",
+#         Name.Exception: "#bbbbbb",
+#         Name.Tag: "bold #45df9a",
+#         Name.Attribute: "#bbbbbb",
+#         Name.Decorator: "#6ad7ca",
+#         Generic.Heading: "bold #ffffff",
+#         Generic.Subheading: "underline #ffffff",
+#         Generic.Deleted: "#ff3a3a",
+#         Generic.Inserted: "#589819",
+#         Generic.Error: "#ff3a3a",
+#         Generic.Emph: "italic",
+#         Generic.Strong: "bold",
+#         Generic.EmphStrong: "bold italic",
+#         Generic.Prompt: "#aaaaaa",
+#         Generic.Output: "#cccccc",
+#         Generic.Traceback: "#ff3a3a",
+#         Error: "bg:#e3d2d2 #a61717",
+#     }
+#
+# class GloeDarkStyle(Style):
+#     name = "gloe-dark"
+#     background_color = "#202020"
+#     highlight_color = "#404040"
+#     line_number_color = "#aaaaaa"
+#     styles = {
+#         Token: "#d0d0d0",
+#         Whitespace: "#666666",
+#         Comment: "italic #ababab",
+#         Comment.Preproc: "noitalic bold #ff3a3a",
+#         Comment.Special: "noitalic bold #e50808 bg:#520000",
+#         Keyword: "bold #45df9a",
+#         Keyword.Pseudo: "nobold",
+#         Operator.Word: "bold #45df9a",
+#         String: "#6ad7ca",
+#         String.Other: "#6ad7ca",
+#         Number: "#51b2fd",
+#         Name.Builtin: "#2fbccd",
+#         Name.Variable: "#40ffff",
+#         Name.Constant: "#40ffff",
+#         Name.Class: "underline #14c8ef",
+#         Name.Function: "#14c8ef",
+#         Name.Namespace: "underline #14c8ef",
+#         Name.Exception: "#bbbbbb",
+#         Name.Tag: "bold #45df9a",
+#         Name.Attribute: "#bbbbbb",
+#         Name.Decorator: "#6ad7ca",
+#         Generic.Heading: "bold #ffffff",
+#         Generic.Subheading: "underline #ffffff",
+#         Generic.Deleted: "#ff3a3a",
+#         Generic.Inserted: "#589819",
+#         Generic.Error: "#ff3a3a",
+#         Generic.Emph: "italic",
+#         Generic.Strong: "bold",
+#         Generic.EmphStrong: "bold italic",
+#         Generic.Prompt: "#aaaaaa",
+#         Generic.Output: "#cccccc",
+#         Generic.Traceback: "#ff3a3a",
+#         Error: "bg:#e3d2d2 #a61717",
+#     }
+#
 # pygments_style = "styles.GloeLightStyle"
 # pygments_dark_style = "styles.GloeDarkStyle"

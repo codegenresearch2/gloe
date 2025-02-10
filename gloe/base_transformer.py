@@ -4,7 +4,7 @@ import uuid
 import inspect
 from functools import cached_property
 from inspect import Signature
-from typing import Any, Callable, Generic, Type, TypeVar, Union, cast, Iterable, get_args, get_origin
+from typing import Any, Callable, Generic, Type, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
 import networkx as nx
@@ -25,6 +25,8 @@ _Out4 = TypeVar("_Out4")
 _Out5 = TypeVar("_Out5")
 _Out6 = TypeVar("_Out6")
 _Out7 = TypeVar("_Out7")
+
+TypeAlias = TypeVar("TypeAlias")
 
 PreviousTransformer: TypeAlias = Union[
     None,

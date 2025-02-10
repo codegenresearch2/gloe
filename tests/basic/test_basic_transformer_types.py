@@ -1,12 +1,6 @@
-from typing import TypeVar
-
+from typing import TypeVar, Union
 from typing_extensions import assert_type
-
-from gloe import (
-    Transformer,
-    async_transformer,
-    AsyncTransformer,
-)
+from gloe import Transformer, AsyncTransformer
 from gloe.experimental import bridge
 from gloe.utils import forward
 from tests.lib.transformers import (

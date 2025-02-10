@@ -109,14 +109,14 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_async_transformer_wrong_arg(self):
-        def just_a_normal_function():
+        def next_transformer():
             return None
 
         with self.assertRaises(UnsupportedTransformerArgException):
-            _ = request_data >> just_a_normal_function  # type: ignore
+            _ = request_data >> next_transformer  # type: ignore
 
         with self.assertRaises(UnsupportedTransformerArgException):
-            _ = request_data >> (just_a_normal_function, forward[int]())  # type: ignore
+            _ = request_data >> (next_transformer, forward[int]())  # type: ignore
 
     async def test_transformer_copying(self):
         graph = request_data >> forward()

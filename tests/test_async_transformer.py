@@ -21,31 +21,26 @@ async def request_data(url: str) -> dict[str, str]:
     return _DATA
 
 
-class HasNotBarKey(Exception):
+class HasNotFooKey(Exception):
     pass
 
 
-class HasBarKey(Exception):
+class HasFooKey(Exception):
     pass
 
 
-class IsNotString(Exception):
+class IsNotInt(Exception):
     pass
 
 
-def has_bar_key(dict: dict[str, str]):
-    if "bar" not in dict.keys():
-        raise HasNotBarKey()
+def has_foo_key(dict: dict[str, str]):
+    if "foo" not in dict.keys():
+        raise HasNotFooKey()
 
 
-def is_string(data: Any):
-    if not isinstance(data, str):
-        raise IsNotString()
-
-
-def foo_key_removed(dict: dict[str, str]):
-    if "foo" in dict.keys():
-        raise HasBarKey()
+def is_int(data: Any):
+    if not isinstance(data, int):
+        raise IsNotInt()
 
 
 _URL = "http://my-service"
@@ -96,7 +91,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -104,11 +99,11 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_request >> forward()
 
-        with self.assertRaises(HasNotBarKey):
-            await pipeline(_URL)
+        with self.assertRaises(HasNotFooKey):
+            await pipeline(123)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -116,14 +111,14 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_delayed_request(0.1) >> forward()
 
-        with self.assertRaises(HasNotBarKey):
-            await pipeline(_URL)
+        with self.assertRaises(HasNotFooKey):
+            await pipeline(123)
 
     async def test_async_transformer_wrong_arg(self):
         def next_transformer():
             pass
 
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)

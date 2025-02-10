@@ -98,7 +98,7 @@ class _PartialAsyncTransformer(Generic[A, P1, S]):
         func = self.func
         func_signature = inspect.signature(func)
 
-        class LambdaTransformer(AsyncTransformer[A, S]):
+        class LambdaAsyncTransformer(AsyncTransformer[A, S]):
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
 
@@ -108,7 +108,7 @@ class _PartialAsyncTransformer(Generic[A, P1, S]):
             async def transform_async(self, data: A) -> S:
                 return await func(data, *args, **kwargs)
 
-        lambda_transformer = LambdaTransformer()
+        lambda_transformer = LambdaAsyncTransformer()
         lambda_transformer.__class__.__name__ = func.__name__
         lambda_transformer._label = func.__name__
         return lambda_transformer

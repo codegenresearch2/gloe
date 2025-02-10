@@ -39,7 +39,7 @@ ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 # Additional configuration options
-templates_path = ["_templates"]  # Updated to match the gold code
+templates_path = ["_templates"]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
 autodoc_typehints = "description"
 autodoc_type_aliases = {
@@ -51,7 +51,10 @@ autodoc_type_aliases = {
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
-html_sidebars: dict[str, list[str]] = {  # Updated type annotation to match the gold code
+# html_use_index = False  # Commented out in the gold code
+# html_domain_indices = False  # Commented out in the gold code
+# html_copy_source = False  # Commented out in the gold code
+html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
 # autodoc_default_options = {"ignore-module-all": True}  # Commented out in the gold code
@@ -87,3 +90,4 @@ html_theme_options = {
 
 # pygments_style = "styles.GloeStyle"  # Commented out in the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"  # Added light style for Pygments

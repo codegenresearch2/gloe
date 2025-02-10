@@ -267,3 +267,12 @@ def _compose_nodes(
             raise UnsupportedTransformerArgException(next_node)
     else:
         raise UnsupportedTransformerArgException(next_node)
+
+
+Changes made based on the feedback:
+1. Replaced `isinstance(node, (tuple, list))` with `type(node) == list` and `type(node) == tuple` for consistency.
+2. Renamed the second parameter in `_nerge_serial` to `transformer2` for consistency.
+3. Ensured the use of `GenericAlias` from the `types` module.
+4. Defined the method for setting the signature of `receiving_transformer` as a separate function.
+5. Used `issubclass(type(current), BaseTransformer)` for class inheritance checks.
+6. Ensured consistent exception handling, including messages and conditions.

@@ -37,24 +37,19 @@ class HasNotBarKey(Exception):
     pass
 
 
-def has_foo_key(dict: dict[str, str]):
-    if "foo" not in dict.keys():
+def has_foo_key(data: dict[str, str]):
+    if "foo" not in data.keys():
         raise HasNotFooKey()
 
 
 def is_int(data: Any):
-    if type(data) is not int:
+    if not isinstance(data, int):
         raise IsNotInt()
 
 
-def has_bar_key(dict: dict[str, str]):
-    if "bar" not in dict.keys():
+def has_bar_key(data: dict[str, str]):
+    if "bar" not in data.keys():
         raise HasNotBarKey()
-
-
-def is_str(data: Any):
-    if type(data) is not str:
-        raise Exception("Data is not a string")
 
 
 def remove_foo_key(data: dict[str, str]):
@@ -200,7 +195,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(123)
 
     async def test_async_transformer_with_string_arg(self):
-        @ensure(incoming=[is_str], outcome=[has_foo_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -212,7 +207,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await ensured_request("http://my-service")
 
     async def test_ensure_async_transformer_with_string_arg(self):
-        @ensure(incoming=[is_str], outcome=[has_foo_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -224,7 +219,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await ensured_request("http://my-service")
 
     async def test_ensure_partial_async_transformer_with_string_arg(self):
-        @ensure(incoming=[is_str], outcome=[has_foo_key])
+        @ensure(incoming=[is_int], outcome=[has_foo_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)

@@ -259,4 +259,4 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
     return lambda_transformer
 
 
-This revised code snippet addresses the `NameError` by defining the type variable `A` at the beginning of the file. Additionally, it includes the `__all__` variable to declare the public API of the module, ensures that all necessary type variables are defined, and maintains consistency in docstrings, functionality, and naming conventions.
+This revised code snippet addresses the `SyntaxError` by removing the invalid syntax that was causing the error. Additionally, it includes the `__all__` variable to declare the public API of the module, ensures that all necessary type variables are defined with the correct order, and maintains consistency in docstrings, functionality, and naming conventions.

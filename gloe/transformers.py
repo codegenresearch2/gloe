@@ -25,10 +25,9 @@ O5 = TypeVar("O5")
 O6 = TypeVar("O6")
 O7 = TypeVar("O7")
 
-
-Tr = "Transformer"
-AT = AsyncTransformer
-BT = BaseTransformer[I, O, Any]
+Tr: TypeAlias = "Transformer"
+AT: TypeAlias = AsyncTransformer
+BT: TypeAlias = BaseTransformer[I, O, Any]
 
 AsyncNext2 = Union[
     tuple[AT[O, O1], BT[O, O2]],
@@ -147,10 +146,10 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if transformed is not None:
+        if type(transformed) is not None:
             return cast(O, transformed)
 
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @overload
     def __rshift__(self, next_node: "Tr[O, O1]") -> "Tr[I, O1]":

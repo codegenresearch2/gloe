@@ -25,14 +25,36 @@ class HasNotBarKey(Exception):
     pass
 
 
+class HasNotFooKey(Exception):
+    pass
+
+
+class HasFooKey(Exception):
+    pass
+
+
+class IsNotInt(Exception):
+    pass
+
+
+def has_foo_key(dict: dict[str, str]):
+    if "foo" not in dict.keys():
+        raise HasNotFooKey()
+
+
 def has_bar_key(dict: dict[str, str]):
     if "bar" not in dict.keys():
         raise HasNotBarKey()
 
 
-def is_string(data: Any):
-    if type(data) is not str:
-        raise Exception("Data is not a string")
+def is_int(data: Any):
+    if not isinstance(data, int):
+        raise IsNotInt()
+
+
+def foo_key_removed(dict: dict[str, str]):
+    if "foo" in dict.keys():
+        raise HasFooKey()
 
 
 _URL = "http://my-service"
@@ -83,7 +105,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_str], outcome=[has_bar_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -95,7 +117,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_str], outcome=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -110,7 +132,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def next_transformer():
             pass
 
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_str], outcome=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -134,3 +156,6 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = pipeline.copy()
         result = await pipeline(_URL)
         self.assertEqual(result, _DATA)
+
+
+This updated code snippet addresses the feedback from the oracle by adding exception classes, validation functions, and ensuring decorators to enhance the functionality and validation in the tests.

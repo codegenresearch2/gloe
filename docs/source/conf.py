@@ -65,8 +65,6 @@ html_sidebars = {
 
 # Use the correct pygments styles as specified in the gold code
 pygments_style = "styles.GloeStyle"
-pygments_dark_style = "styles.GloeDarkStyle"
-pygments_light_style = "styles.GloeLightStyle"
 
 # Include all relevant variables in light_css_variables
 light_css_variables = {

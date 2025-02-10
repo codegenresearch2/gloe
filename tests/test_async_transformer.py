@@ -43,7 +43,7 @@ def has_foo_key(dict: dict[str, str]):
 
 
 def is_int(data: Any):
-    if not isinstance(data, int):
+    if type(data) is not int:
         raise IsNotInt()
 
 
@@ -53,7 +53,7 @@ def has_bar_key(dict: dict[str, str]):
 
 
 def is_str(data: Any):
-    if not isinstance(data, str):
+    if type(data) is not str:
         raise Exception("Data is not a string")
 
 

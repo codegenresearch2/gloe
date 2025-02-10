@@ -1,7 +1,6 @@
 import traceback
 from abc import ABC, abstractmethod
 from inspect import Signature
-
 from typing import (
     TypeVar,
     overload,
@@ -27,9 +26,9 @@ O6 = TypeVar("O6")
 O7 = TypeVar("O7")
 
 
-Tr: TypeAlias = "Transformer"
-AT: TypeAlias = AsyncTransformer
-BT: TypeAlias = BaseTransformer[I, O, Any]
+Tr = "Transformer"
+AT = AsyncTransformer
+BT = BaseTransformer[I, O, Any]
 
 AsyncNext2 = Union[
     tuple[AT[O, O1], BT[O, O2]],
@@ -148,10 +147,18 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if type(transformed) is not None:
+        if transformed is not None:
             return cast(O, transformed)
 
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
+
+    @overload
+    def __rshift__(self, next_node: "Tr[O, O1]") -> "Tr[I, O1]":
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncTransformer[O, O1]) -> AsyncTransformer[I, O1]:
+        pass
 
     @overload
     def __rshift__(
@@ -164,7 +171,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
     def __rshift__(
         self,
         next_node: tuple["Tr[O, O1]", "Tr[O, O2]", "Tr[O, O3]"],
-    ) -> "Transformer[I, tuple[O1, O2, O3]]":
+    ) -> "Tr[I, tuple[O1, O2, O3]]":
         pass
 
     @overload
@@ -206,52 +213,59 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         pass
 
     @overload
-    def __rshift__(self, next_node: "Tr[O, O1]") -> "Tr[I, O1]":
-        pass
-
-    @overload
-    def __rshift__(self, next_node: AsyncTransformer[O, O1]) -> AsyncTransformer[I, O1]:
-        pass
-
-    @overload
     def __rshift__(
         self,
-        next_node: AsyncNext2[O, O1, O2],
+        next_node: tuple[AT[O, O1], BT[O, O2]],
     ) -> AsyncTransformer[I, tuple[O1, O2]]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: AsyncNext3[O, O1, O2, O3],
+        next_node: tuple[AT[O, O1], BT[O, O2], BT[O, O3]],
     ) -> AsyncTransformer[I, tuple[O1, O2, O3]]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: AsyncNext4[O, O1, O2, O3, O4],
+        next_node: tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4]],
     ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4]]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: AsyncNext5[O, O1, O2, O3, O4, O5],
+        next_node: tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5]],
     ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: AsyncNext6[O, O1, O2, O3, O4, O5, O6],
+        next_node: tuple[
+            AT[O, O1],
+            BT[O, O2],
+            BT[O, O3],
+            BT[O, O4],
+            BT[O, O5],
+            BT[O, O6],
+        ],
     ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: AsyncNext7[O, O1, O2, O3, O4, O5, O6, O7],
+        next_node: tuple[
+            AT[O, O1],
+            BT[O, O2],
+            BT[O, O3],
+            BT[O, O4],
+            BT[O, O5],
+            BT[O, O6],
+            BT[O, O7],
+        ],
     ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
         pass
 

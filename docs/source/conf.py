@@ -51,6 +51,9 @@ autodoc_type_aliases = {
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
+# html_use_index = False  # Don't create index
+# html_domain_indices = False  # Don't need module indices
+# html_copy_source = False  # Don't need sources
 html_sidebars = {
     "Home": ["/"],
 }
@@ -81,5 +84,4 @@ html_theme_options = {
     ],
 }
 
-# pygments_style = "styles.GloeStyle"
-# Commented out to match the gold code
+pygments_dark_style = "styles.GloeLightStyle"

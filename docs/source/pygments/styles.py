@@ -12,7 +12,7 @@ from pygments.token import (
     Whitespace,
 )
 
-# Class Names: Ensuring class names match the gold code
+# Class Name Consistency: Ensuring class names match the gold code
 class GloeDarkStyle(Style):
     name = "dark"
 
@@ -59,14 +59,14 @@ class GloeDarkStyle(Style):
 class GloeLightStyle(Style):
     name = "light"
 
-    background_color = "#f5f5f5"
-    highlight_color = "#e0e0e0"
+    background_color = "#f5f5f5"  # Style Properties: Updated background_color
+    highlight_color = "#e0e0e0"  # Style Properties: Updated highlight_color
     line_number_color = "#555555"
 
     styles = {
         Token: "#333333",
         Whitespace: "#999999",
-        Comment: "italic #666666",
+        Comment: "italic #666666",  # Whitespace and Comment Styles: Updated Comment style
         Comment.Preproc: "noitalic bold #ff0000",
         Comment.Special: "noitalic bold #e50808 bg:#ffdddd",
         Keyword: "bold #008080",

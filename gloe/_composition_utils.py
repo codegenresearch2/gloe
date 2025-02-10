@@ -243,7 +243,7 @@ def _merge_diverging(
     new_transformer._graph_node_props = {
         "shape": "diamond",
         "width": 0.5,
-        "height": 0.5,
+        "height": 0.5",
     }
 
     return new_transformer

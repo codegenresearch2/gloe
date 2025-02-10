@@ -24,14 +24,15 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
-P = ParamSpec("P")
+P1 = ParamSpec("P1")
+P2 = ParamSpec("P2")
 
 
-class _PartialTransformer(Generic[A, P, S]):
-    def __init__(self, func: Callable[Concatenate[A, P], S]):
+class _PartialTransformer(Generic[A, P1, S]):
+    def __init__(self, func: Callable[Concatenate[A, P1], S]):
         self.func = func
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> Transformer[A, S]:
+    def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> Transformer[A, S]:
         func = self.func
         func_signature = inspect.signature(func)
 
@@ -52,8 +53,8 @@ class _PartialTransformer(Generic[A, P, S]):
 
 
 def partial_transformer(
-    func: Callable[Concatenate[A, P], S]
-) -> _PartialTransformer[A, P, S]:
+    func: Callable[Concatenate[A, P1], S]
+) -> _PartialTransformer[A, P1, S]:
     """
     This decorator allows us to create partial transformers, which are transformers that
     allow for partial application of their arguments. This capability is particularly
@@ -94,11 +95,11 @@ def partial_transformer(
     return _PartialTransformer(func)
 
 
-class _PartialAsyncTransformer(Generic[A, P, S]):
-    def __init__(self, func: Callable[Concatenate[A, P], Awaitable[S]]):
+class _PartialAsyncTransformer(Generic[A, P2, S]):
+    def __init__(self, func: Callable[Concatenate[A, P2], Awaitable[S]]):
         self.func = func
 
-    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> AsyncTransformer[A, S]:
+    def __call__(self, *args: P2.args, **kwargs: P2.kwargs) -> AsyncTransformer[A, S]:
         func = self.func
         func_signature = inspect.signature(func)
 
@@ -119,8 +120,8 @@ class _PartialAsyncTransformer(Generic[A, P, S]):
 
 
 def partial_async_transformer(
-    func: Callable[Concatenate[A, P], Awaitable[S]]
-) -> _PartialAsyncTransformer[A, P, S]:
+    func: Callable[Concatenate[A, P2], Awaitable[S]]
+) -> _PartialAsyncTransformer[A, P2, S]:
     """
     This decorator enables us to create partial asynchronous transformers, which are
     transformers capable of partial argument application. Such functionality is invaluable

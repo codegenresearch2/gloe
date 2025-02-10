@@ -12,10 +12,11 @@ from pygments.token import (
     Whitespace,
 )
 
-# Switching to a different pygments style
-class GloeStyle(Style):
-    name = "custom"
+# Class name reflects the style it represents
+class GloeLightStyle(Style):
+    name = "custom_light"
 
+    # Background and highlight colors match the gold code
     background_color = "#f5f5f5"
     highlight_color = "#e0e0e0"
     line_number_color = "#555555"
@@ -71,17 +72,5 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# Adding light theme CSS variables for customization
-html_theme_options = {
-    # ... existing options ...
-    "light_css_variables": {
-        "color-brand-primary": "#007acc",
-        "color-brand-content": "#007acc",
-        "font-stack": "Arial, sans-serif",
-        "font-stack--monospace": "Courier New, monospace",
-        "font-size--normal": "16px",
-    },
-}
-
-# Switching to a different pygments style
-pygments_style = "styles.GloeStyle"
+# Pygments style reference matches the naming convention used in the gold code
+pygments_light_style = "styles.GloeLightStyle"

@@ -1,4 +1,4 @@
-from typing import TypeVar, get_origin, GenericAlias, ParamSpec
+from typing import TypeVar, get_origin, GenericAlias, ParamSpec, Callable
 from functools import wraps
 
 _Args = ParamSpec("_Args")

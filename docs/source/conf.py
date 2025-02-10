@@ -23,9 +23,8 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",  # Commented out in the gold code
     "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",  # Consider adding this extension
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -35,12 +34,12 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out in the gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 # Additional configuration options
-templates_path = ["_static"]
+templates_path = ["_templates"]  # Updated to match the gold code
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
 autodoc_typehints = "description"
 autodoc_type_aliases = {
@@ -50,15 +49,12 @@ autodoc_type_aliases = {
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_title = "Gloe"
-# html_logo = "assets/gloe-logo-small.png"  # Consider adding this option
 html_theme = "furo"
 html_last_updated_fmt = ""
-# html_use_index = False  # Don't create index
-# html_domain_indices = False  # Don't need module indices
-# html_copy_source = False  # Don't need sources
-html_sidebars = {
+html_sidebars: dict[str, list[str]] = {  # Updated type annotation to match the gold code
     "Home": ["/"],
 }
+# autodoc_default_options = {"ignore-module-all": True}  # Commented out in the gold code
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
@@ -66,7 +62,7 @@ html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
     "light_css_variables": {
-        # Add styles for the light theme
+        # Add light CSS variables here
     },
     "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
@@ -89,6 +85,5 @@ html_theme_options = {
     ],
 }
 
-# Pygments style options
+# pygments_style = "styles.GloeStyle"  # Commented out in the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
-pygments_light_style = "styles.GloeLightStyle"  # Add this option

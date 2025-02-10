@@ -7,6 +7,8 @@ from inspect import Signature
 from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
+import networkx as nx
+from networkx import DiGraph, Graph
 
 from gloe._utils import _format_return_annotation
 
@@ -23,7 +25,6 @@ _Out4 = TypeVar("_Out4")
 _Out5 = TypeVar("_Out5")
 _Out6 = TypeVar("_Out6")
 _Out7 = TypeVar("_Out7")
-
 
 PreviousTransformer: TypeAlias = Union[
     None,
@@ -68,28 +69,56 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def label(self) -> str:
+        """
+        Label used in visualization.
+
+        When the transformer is created by the `@transformer` decorator, it is the
+        name of the function.
+
+        When creating a transformer by extending the `Transformer` class, it is the name of
+        the class.
+        """
         return self._label
 
     @property
     def graph_node_props(self) -> dict[str, Any]:
+        """
+        Properties for the graph node visualization.
+        """
         return self._graph_node_props
 
     @property
     def children(self) -> list["BaseTransformer"]:
+        """
+        List of child transformers.
+        """
         return self._children
 
     @property
     def previous(self) -> PreviousTransformer["BaseTransformer"]:
+        """
+        Previous transformers. It can be None, a single transformer, or a tuple of many
+        transformers.
+        """
         return self._previous
 
     @property
     def invisible(self) -> bool:
+        """
+        Indicates whether the transformer is invisible in visualizations.
+        """
         return self._invisible
 
     def __hash__(self) -> int:
+        """
+        Returns the hash of the transformer's ID.
+        """
         return hash(self.id)
 
     def __eq__(self, other):
+        """
+        Compares transformers based on their ID.
+        """
         if isinstance(other, BaseTransformer):
             return self.id == other.id
         return NotImplemented
@@ -99,7 +128,17 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         transform: Callable[[_Self, _In], _Out] | None = None,
         regenerate_instance_id: bool = False,
     ) -> _Self:
-        copied = copy.copy(self)
+        """
+        Creates a deep copy of the transformer.
+
+        Args:
+            transform (Callable[[_Self, _In], _Out] | None): The transform method to use.
+            regenerate_instance_id (bool): Whether to regenerate the instance ID.
+
+        Returns:
+            _Self: A deep copy of the transformer.
+        """
+        copied = copy.deepcopy(self)
 
         func_type = types.MethodType
         if transform is not None:
@@ -125,6 +164,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def graph_nodes(self) -> dict[UUID, "BaseTransformer"]:
+        """
+        Returns a dictionary of all graph nodes, including the current transformer and its ancestors.
+        """
         nodes = {self.instance_id: self}
 
         if self.previous is not None:
@@ -140,6 +182,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         return nodes
 
     def _set_previous(self, previous: PreviousTransformer):
+        """
+        Sets the previous transformer(s) for the current transformer.
+        """
         if self.previous is None:
             self._previous = previous
         elif type(self.previous) == tuple:
@@ -149,9 +194,15 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             self.previous._set_previous(previous)
 
     def signature(self) -> Signature:
+        """
+        Returns the signature of the transformer's transform method.
+        """
         return self._signature(type(self))
 
-    def _signature(self, klass: type) -> Signature:
+    def _signature(self, klass: Type) -> Signature:
+        """
+        Helper method to return the signature of the transformer's transform method.
+        """
         orig_bases = getattr(self, "__orig_bases__", [])
         transformer_args = [
             get_args(base) for base in orig_bases if get_origin(base) == klass
@@ -195,16 +246,25 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def output_type(self) -> Any:
+        """
+        Returns the output type of the transformer.
+        """
         signature = self.signature()
         return signature.return_annotation
 
     @property
     def output_annotation(self) -> str:
+        """
+        Returns the output annotation as a string.
+        """
         output_type = self.output_type
         return _format_return_annotation(output_type, None, None)
 
     @property
     def input_type(self) -> Any:
+        """
+        Returns the input type of the transformer.
+        """
         parameters = list(self.signature().parameters.items())
         if len(parameters) > 0:
             parameter_type = parameters[0][1].annotation
@@ -212,9 +272,16 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def input_annotation(self) -> str:
-        return self.input_type.__name__
+        """
+        Returns the input annotation as a string.
+        """
+        input_type = self.input_type
+        return input_type.__name__ if input_type else "Unknown"
 
-    def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}):
+    def _add_net_node(self, net: DiGraph, custom_data: dict[str, Any] = {}):
+        """
+        Adds the transformer to the networkx graph.
+        """
         node_id = self.node_id
         props = {**self.graph_node_props, **custom_data, "label": self.label}
         if node_id not in net.nodes:
@@ -230,14 +297,23 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         parent_id: str,
         next_node: "BaseTransformer",
     ):
+        """
+        Adds a child node to the networkx graph.
+        """
         child._dag(child_net, next_node, {"parent_id": parent_id, "bounding_box": True, "box_label": "mapping"})
 
     @property
     def node_id(self) -> str:
+        """
+        Returns the node ID as a string.
+        """
         return str(self.instance_id)
 
     @cached_property
     def visible_previous(self) -> PreviousTransformer["BaseTransformer"]:
+        """
+        Returns the visible previous transformer(s).
+        """
         previous = self.previous
 
         if isinstance(previous, BaseTransformer):
@@ -255,6 +331,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         return previous
 
     def _add_children_subgraph(self, net: DiGraph, next_node: "BaseTransformer"):
+        """
+        Adds a subgraph for the children nodes.
+        """
         next_node_id = next_node.node_id
         children_nets = [DiGraph() for _ in self.children]
         visible_previous = self.visible_previous
@@ -286,6 +365,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         next_node: Union["BaseTransformer", None] = None,
         custom_data: dict[str, Any] = {},
     ):
+        """
+        Adds the transformer and its children to the networkx graph.
+        """
         in_nodes = [edge[1] for edge in net.in_edges()]
 
         previous = self.previous
@@ -329,12 +411,18 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             self._add_children_subgraph(net, next_node)
 
     def graph(self) -> DiGraph:
+        """
+        Returns the networkx DiGraph representation of the transformer and its children.
+        """
         net = nx.DiGraph()
         net.graph["splines"] = "ortho"
         self._dag(net)
         return net
 
     def export(self, path: str, with_edge_labels: bool = True):
+        """
+        Exports the graph to a file.
+        """
         net = self.graph()
         boxed_nodes = [
             node
@@ -358,4 +446,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         agraph.write(path)
 
     def __len__(self):
+        """
+        Returns the length of the transformer.
+        """
         return 1

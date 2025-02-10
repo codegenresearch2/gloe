@@ -47,7 +47,7 @@ html_last_updated_fmt = ""
 # html_copy_source = False
 
 html_sidebars = {
-    "Home": ["/"],
+    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html", "sidebar/navigation.html", "sidebar/ethical-ads.html", "sidebar/scroll-end.html"]
 }
 
 html_static_path = ["_static"]
@@ -78,8 +78,6 @@ html_theme_options = {
     ],
 }
 
-# Comment out the pygments style line
-# pygments_style = "styles.GloeStyle"
-
-# Ensure the pygments styles are consistent
-pygments_dark_style = "styles.GloeLightStyle"
+# Define both pygments styles
+pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"

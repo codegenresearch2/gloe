@@ -4,7 +4,7 @@ import uuid
 import inspect
 from functools import cached_property
 from inspect import Signature
-from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
+from typing import Any, Callable, Generic, Type, TypeVar, Union, cast, Iterable, get_args, get_origin
 from uuid import UUID
 from itertools import groupby
 import networkx as nx
@@ -138,7 +138,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         Returns:
             _Self: A deep copy of the transformer.
         """
-        copied = copy.deepcopy(self)
+        copied = copy.copy(self)
 
         func_type = types.MethodType
         if transform is not None:

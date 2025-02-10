@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    # "sphinx.ext.intersphinx",  # Commented out as per oracle feedback
+    "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
     "myst_parser",
     "sphinx_copybutton",
@@ -36,7 +36,7 @@ napoleon_google_docstring = True
 napoleon_use_rtype = False
 
 # Intersphinx mapping
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

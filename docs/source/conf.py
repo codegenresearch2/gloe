@@ -36,9 +36,9 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+
+# Intersphinx mapping is commented out in the gold code
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 
 templates_path = ["_templates"]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
@@ -58,14 +58,15 @@ html_use_index = False
 html_domain_indices = False
 html_copy_source = False
 
+# Adjust html_sidebars to match the gold code format and content
 html_sidebars = {
     "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html", "sidebar/navigation.html", "sidebar/ethical-ads.html", "sidebar/scroll-end.html"]
 }
 
-# Pygments styles
+# Use the correct pygments styles as specified in the gold code
 pygments_style = "styles.GloeStyle"
 
-# Light CSS variables
+# Include all relevant variables in light_css_variables
 light_css_variables = {
     "color-brand-primary": "#00e6bf",
     "color-brand-content": "#00e6bf",
@@ -74,7 +75,7 @@ light_css_variables = {
     "font-size--normal": "Courier, monospace",
 }
 
-# Footer icons
+# Match the footer_icons format and content with the gold code
 footer_icons = [
     {
         "name": "GitHub",
@@ -88,7 +89,7 @@ footer_icons = [
     },
 ]
 
-# HTML theme options
+# Match the HTML theme options with the gold code
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",

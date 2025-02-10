@@ -34,7 +34,27 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {}  # Commented out as per oracle feedback
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_title = "Gloe"
+html_theme = "furo"
+html_last_updated_fmt = ""
+# html_logo = "assets/gloe-logo-small.png"
+# html_use_index = False
+# html_domain_indices = False
+# html_copy_source = False
+html_sidebars = {
+    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html", "sidebar/navigation.html", "sidebar/ethical-ads.html", "sidebar/scroll-end.html"]
+}
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -43,7 +63,7 @@ html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
 html_sidebars = {
-    "Home": ["/"],
+    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html", "sidebar/navigation.html", "sidebar/ethical-ads.html", "sidebar/scroll-end.html"]
 }
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
@@ -72,5 +92,5 @@ html_theme_options = {
     ],
 }
 
-# pygments_style = "styles.GloeStyle"  # Commented out as per oracle feedback
+# pygments_light_style = "styles.GloeLightStyle"  # Added as per oracle feedback
 pygments_dark_style = "styles.GloeDarkStyle"  # Added as per oracle feedback

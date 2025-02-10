@@ -46,7 +46,8 @@ html_last_updated_fmt = ""
 # html_domain_indices = False
 # html_copy_source = False
 
-html_sidebars = {
+# Type annotations for html_sidebars
+html_sidebars: dict[str, list[str]] = {
     "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html", "sidebar/navigation.html", "sidebar/ethical-ads.html", "sidebar/scroll-end.html"]
 }
 

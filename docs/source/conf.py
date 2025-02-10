@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",  # Commented out as per oracle feedback
     "sphinxext.opengraph",
     "myst_parser",
     "sphinx_copybutton",
@@ -36,7 +36,7 @@ napoleon_google_docstring = True
 napoleon_use_rtype = False
 
 # Intersphinx mapping
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -108,8 +108,8 @@ from pygments.token import (
     Whitespace,
 )
 
-class GloeStyle(Style):
-    name = "gloe-style"
+class GloeDarkStyle(Style):
+    name = "gloe-dark"
 
     background_color = "#202020"
     highlight_color = "#404040"
@@ -151,8 +151,51 @@ class GloeStyle(Style):
         Error: "bg:#e3d2d2 #a61717",
     }
 
-pygments_dark_style = "GloeStyle"
-pygments_light_style = "GloeStyle"
+class GloeLightStyle(Style):
+    name = "gloe-light"
+
+    background_color = "#ffffff"
+    highlight_color = "#404040"
+    line_number_color = "#aaaaaa"
+
+    styles = {
+        Token: "#d0d0d0",
+        Whitespace: "#666666",
+        Comment: "italic #ababab",
+        Comment.Preproc: "noitalic bold #ff3a3a",
+        Comment.Special: "noitalic bold #e50808 bg:#520000",
+        Keyword: "bold #45df9a",
+        Keyword.Pseudo: "nobold",
+        Operator.Word: "bold #45df9a",
+        String: "#6ad7ca",
+        String.Other: "#6ad7ca",
+        Number: "#51b2fd",
+        Name.Builtin: "#2fbccd",
+        Name.Variable: "#40ffff",
+        Name.Constant: "#40ffff",
+        Name.Class: "underline #14c8ef",
+        Name.Function: "#14c8ef",
+        Name.Namespace: "underline #14c8ef",
+        Name.Exception: "#bbbbbb",
+        Name.Tag: "bold #45df9a",
+        Name.Attribute: "#bbbbbb",
+        Name.Decorator: "#6ad7ca",
+        Generic.Heading: "bold #ffffff",
+        Generic.Subheading: "underline #ffffff",
+        Generic.Deleted: "#ff3a3a",
+        Generic.Inserted: "#589819",
+        Generic.Error: "#ff3a3a",
+        Generic.Emph: "italic",
+        Generic.Strong: "bold",
+        Generic.EmphStrong: "bold italic",
+        Generic.Prompt: "#aaaaaa",
+        Generic.Output: "#cccccc",
+        Generic.Traceback: "#ff3a3a",
+        Error: "bg:#e3d2d2 #a61717",
+    }
+
+pygments_dark_style = "GloeDarkStyle"
+pygments_light_style = "GloeLightStyle"
 
 # Open Graph properties
 ogp_site_url = "https://gloe.ideos.com.br/"

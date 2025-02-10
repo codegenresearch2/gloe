@@ -29,21 +29,10 @@ extensions = [
     "sphinxext.opengraph",
     "myst_parser",
     "sphinx_copybutton",
+    # Add any other extensions here
 ]
-overloads_location = "bottom"
-napoleon_google_docstring = True
-autosectionlabel_prefix_document = True
-napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
-autodoc_typehints = "description"
-autodoc_type_aliases = {
-    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
-}
+# Add any other configurations here
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -51,15 +40,20 @@ autodoc_type_aliases = {
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
-# html_use_index = False  # Don't create index
-# html_domain_indices = False  # Don't need module indices
-# html_copy_source = False  # Don't need sources
+
+# Comment out any unused HTML options
+# html_use_index = False
+# html_domain_indices = False
+# html_copy_source = False
+
 html_sidebars = {
     "Home": ["/"],
 }
+
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
+
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
@@ -84,4 +78,8 @@ html_theme_options = {
     ],
 }
 
+# Comment out the pygments style line
+# pygments_style = "styles.GloeStyle"
+
+# Ensure the pygments styles are consistent
 pygments_dark_style = "styles.GloeLightStyle"

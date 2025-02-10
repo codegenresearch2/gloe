@@ -31,7 +31,20 @@ extensions = [
     "sphinx_copybutton",
 ]
 
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+overloads_location = "bottom"
+napoleon_google_docstring = True
+autosectionlabel_prefix_document = True
+napoleon_use_rtype = False
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+ogp_site_url = "https://gloe.ideos.com.br/"
+ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -43,9 +56,6 @@ html_last_updated_fmt = ""
 # html_use_index = False  # Don't create index
 # html_domain_indices = False  # Don't need module indices
 # html_copy_source = False  # Don't need sources
-
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
 
 html_sidebars = {
     "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html"]
@@ -146,7 +156,3 @@ class GloeStyle(Style):
 
 pygments_dark_style = "GloeStyle"
 pygments_light_style = "GloeStyle"
-
-# Open Graph properties
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"

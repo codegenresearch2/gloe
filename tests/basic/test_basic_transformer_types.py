@@ -4,7 +4,14 @@ from typing_extensions import assert_type
 from gloe import Transformer, async_transformer, AsyncTransformer
 from gloe.experimental import bridge
 from gloe.utils import forward
-from tests.lib.transformers import square, square_root, to_string, tuple_concatenate, plus1, minus1
+from tests.lib.transformers import (
+    square,
+    square_root,
+    to_string,
+    tuple_concatenate,
+    plus1,
+    minus1,
+)
 from tests.type_utils.mypy_test_suite import MypyTestSuite
 
 In = TypeVar("In")
@@ -45,13 +52,23 @@ class TestBasicTransformerTypes(MypyTestSuite):
         graph4 = square >> square_root >> (to_string, square, to_string, square)
         assert_type(graph4, Transformer[float, tuple[str, float, str, float]])
 
-        graph5 = square >> square_root >> (to_string, square, to_string, square, to_string)
+        graph5 = (
+            square >> square_root >> (to_string, square, to_string, square, to_string)
+        )
         assert_type(graph5, Transformer[float, tuple[str, float, str, float, str]])
 
-        graph6 = square >> square_root >> (to_string, square, to_string, square, to_string, square)
+        graph6 = (
+            square
+            >> square_root
+            >> (to_string, square, to_string, square, to_string, square)
+        )
         assert_type(graph6, Transformer[float, tuple[str, float, str, float, str, float]])
 
-        graph7 = square >> square_root >> (to_string, square, to_string, square, to_string, square, to_string)
+        graph7 = (
+            square
+            >> square_root
+            >> (to_string, square, to_string, square, to_string, square, to_string)
+        )
         assert_type(graph7, Transformer[float, tuple[str, float, str, float, str, float, str]])
 
     def test_bridge(self):

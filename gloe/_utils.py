@@ -39,7 +39,7 @@ def _format_return_annotation(return_annotation, generic_input_param, input_anno
         return _format_tuple(return_annotation.__args__, generic_input_param, input_annotation)
     if return_annotation.__name__ == 'Union':
         return _format_union(return_annotation, generic_input_param, input_annotation)
-    if type(return_annotation) in {GenericAlias, _GenericAlias}:
+    if isinstance(return_annotation, (GenericAlias, _GenericAlias)):
         return _format_generic_alias(return_annotation, generic_input_param, input_annotation)
     if return_annotation == generic_input_param:
         return str(input_annotation.__name__)

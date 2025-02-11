@@ -1,8 +1,10 @@
 # Configuration file for the Sphinx documentation builder.
+# For more information, see: https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
 
 # -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("pygments"))
 
@@ -12,6 +14,7 @@ author = "Samir Braga"
 release = "0.4.3"
 
 # -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 extensions = [
     "sphinx_toolbox.more_autodoc.variables",
     "sphinx.ext.autosectionlabel",
@@ -21,6 +24,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
+    # "sphinx_autodoc_typehints",  # Included in gold code, but commented out
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -35,10 +39,20 @@ ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 # HTML output options
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+templates_path = ["_static"]  # Included in gold code
+exclude_patterns = ["Thumbs.db", ".DS_Store"]  # Included in gold code
+autodoc_typehints = "description"  # Included in gold code
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
-html_sidebars = {
+# html_use_index = False  # Commented out in gold code
+# html_domain_indices = False  # Commented out in gold code
+# html_copy_source = False  # Commented out in gold code
+html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
 html_static_path = ["_static"]
@@ -70,3 +84,4 @@ html_theme_options = {
 
 # Pygments style options
 pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"

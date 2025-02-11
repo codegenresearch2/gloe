@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from typing import TypeVar
-from gloe import async_transformer, ensure
+from gloe import async_transformer, ensure, UnsupportedTransformerArgException, transformer
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
 
@@ -12,6 +12,10 @@ _DATA = {"foo": "bar"}
 
 class HasNotBarKey(Exception):
     pass
+
+
+def is_string(data: any) -> bool:
+    return isinstance(data, str)
 
 
 def has_bar_key(dict: dict[str, str]):
@@ -97,3 +101,62 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
+
+    async def test_unsupported_transformer_argument(self):
+        def just_a_normal_function():
+            return None
+
+        with self.assertRaises(UnsupportedTransformerArgException):
+            _ = square >> just_a_normal_function  # type: ignore
+
+        with self.assertRaises(UnsupportedTransformerArgException):
+            _ = square >> (just_a_normal_function, plus1)  # type: ignore
+
+    async def test_transformer_copying(self):
+        graph = square >> square_root
+        copied_graph = graph.copy()
+
+        self.assertEqual(graph(2), copied_graph(2))
+
+    async def test_transformer_signature_representation(self):
+        @transformer
+        def to_string(num: int) -> str:
+            """
+            This transformer receives a number as input and return its representation as a string
+            """
+            return str(num)
+
+        self.assertEqual(
+            to_string.__doc__,
+            """
+            This transformer receives a number as input and return its representation as a string
+            """,
+        )
+
+    async def test_transformer_signature_representation_copy(self):
+        graph = square >> square_root
+        copied_graph = graph.copy()
+
+        self.assertEqual(graph(2), copied_graph(2))
+
+    async def test_transformer_nodes_retrieve(self):
+        graph = square >> square_root
+        nodes = graph.graph_nodes()
+
+        expected_nodes = {
+            square.id: square,
+            square_root.id: square_root
+        }
+        self.assertDictEqual(expected_nodes, nodes)
+
+        graph2 = square >> square_root >> (
+            square >> square_root,
+            square >> square_root
+        )
+        nodes = graph2.graph_nodes()
+
+        expected_nodes = {
+            square.id: square,
+            square_root.id: square_root
+        }
+        self.assertDictEqual(expected_nodes, nodes)

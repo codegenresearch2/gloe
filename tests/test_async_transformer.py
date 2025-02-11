@@ -1,11 +1,12 @@
 import asyncio
 import unittest
-from typing import TypeVar
-from gloe import async_transformer, ensure, UnsupportedTransformerArgException, transformer
+from typing import TypeVar, Any
+from gloe import async_transformer, ensure, transformer
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
 
 _In = TypeVar("_In")
+_Out = TypeVar("_Out")
 
 _DATA = {"foo": "bar"}
 
@@ -14,7 +15,7 @@ class HasNotBarKey(Exception):
     pass
 
 
-def is_string(data: any) -> bool:
+def is_string(data: Any) -> bool:
     if not isinstance(data, str):
         raise ValueError("Input must be a string")
     return True
@@ -25,10 +26,12 @@ def has_bar_key(dict: dict[str, str]):
         raise HasNotBarKey()
 
 
+@transformer
 def square(num: float) -> float:
     return num * num
 
 
+@transformer
 def square_root(num: float) -> float:
     if num < 0:
         raise ValueError("Cannot compute square root of a negative number")
@@ -118,10 +121,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def just_a_normal_function():
             return None
 
-        with self.assertRaises(UnsupportedTransformerArgException):
+        with self.assertRaises(TypeError):
             _ = square >> just_a_normal_function  # type: ignore
 
-        with self.assertRaises(UnsupportedTransformerArgException):
+        with self.assertRaises(TypeError):
             _ = square >> (just_a_normal_function, plus1)  # type: ignore
 
     async def test_transformer_copying(self):
@@ -172,3 +175,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             square_root.id: square_root
         }
         self.assertDictEqual(expected_nodes, nodes)
+
+
+if __name__ == "__main__":
+    unittest.main()

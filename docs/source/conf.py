@@ -42,6 +42,20 @@ napoleon_use_rtype = False
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
+# -- Options for templates ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-templates
+
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+
+# -- Options for autodoc ----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
+
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
@@ -63,6 +77,13 @@ html_theme_options = {
     # "main_nav_links": {"Docs": "/index", "About": "/about"},
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
+    "light_css_variables": {
+        "color-brand-primary": "#00e6bf",
+        "color-brand-content": "#00e6bf",
+        "font-stack": "Roboto, sans-serif",
+        "font-stack--monospace": "Courier, monospace",
+        "font-size--normal": "Courier, monospace",
+    },
     "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",

@@ -37,10 +37,6 @@ from mypy import api
 
 from tests.type_utils.mypy_test_suite import MypyTestSuite
 
-In = TypeVar("In")
-Out = TypeVar("Out")
-
-
 class TestTransformerTypes(MypyTestSuite):
     mypy_result: str
 

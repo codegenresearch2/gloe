@@ -59,11 +59,7 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         try:
             result = await self.transform_async(data)
             if result is None:
-                raise TransformerException(
-                    internal_exception=NotImplementedError("Transform method did not return a valid result"),
-                    raiser_transformer=self,
-                    message="Transform method did not return a valid result",
-                )
+                raise NotImplementedError("Transform method did not return a valid result")
             return cast(_Out, result)
         except Exception as e:
             tb = traceback.extract_tb(e.__traceback__)

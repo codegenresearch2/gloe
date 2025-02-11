@@ -1,12 +1,23 @@
+import asyncio
+from functools import wraps
 from types import GenericAlias
 from typing import (
     TypeVar,
     get_origin,
+    TypeAlias,
+    TypedDict,
+    Generic,
+    Union,
     _GenericAlias,
+    ParamSpec,
+    Callable,
+    Awaitable,
 )  # type: ignore
 
 
-def _format_tuple(tuple_annotation: tuple, generic_input_param, input_annotation) -> str:
+def _format_tuple(
+    tuple_annotation: tuple, generic_input_param, input_annotation
+) -> str:
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
@@ -15,7 +26,9 @@ def _format_tuple(tuple_annotation: tuple, generic_input_param, input_annotation
     return f"({', '.join(formatted)})"
 
 
-def _format_union(tuple_annotation: tuple, generic_input_param, input_annotation) -> str:
+def _format_union(
+    tuple_annotation: tuple, generic_input_param, input_annotation
+) -> str:
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
@@ -130,3 +143,18 @@ def _specify_types(generic, spec):
     args = tuple(_specify_types(arg, spec) for arg in generic_args)
 
     return GenericAlias(origin, args)
+
+
+_Args = ParamSpec("_Args")
+_R = TypeVar("_R")
+
+
+def awaitify(sync_func: Callable[_Args, _R]) -> Callable[_Args, Awaitable[_R]]:
+    @wraps(sync_func)
+    async def async_func(*args, **kwargs):
+        try:
+            return sync_func(*args, **kwargs)
+        except Exception as e:
+            raise ValueError(f"Error in function {sync_func.__name__}: {str(e)}") from e
+
+    return async_func

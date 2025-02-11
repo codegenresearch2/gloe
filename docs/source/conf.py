@@ -1,4 +1,7 @@
 # Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
 from pygments.style import Style
@@ -44,6 +47,7 @@ ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 html_title = "Gloe"
 html_theme = "furo"
+html_last_updated_fmt = ""
 html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
@@ -67,6 +71,20 @@ html_theme_options = {
             "html": """<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">...</svg>""",
         },
     ],
+}
+
+# -- Options for templates ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-templates
+
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+
+# -- Options for autodoc ----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
+
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
 }
 
 # -- Pygments style configuration --------------------------------------------
@@ -114,21 +132,3 @@ class GloeLightStyle(Style):
     }
 
 pygments_style = "styles.GloeLightStyle"
-
-I have addressed the feedback provided by the oracle and made the necessary changes to the code snippet. Here's the updated version:
-
-1. **Comment Structure**: I have added section headers with dashes for better readability, such as `# -- Project information -----------------------------------------------------`.
-
-2. **Documentation Links**: I have included links to the Sphinx documentation for each section, as seen in the gold code.
-
-3. **Extensions List**: I have reviewed the extensions list and kept the same extensions as in the original code.
-
-4. **Additional Configuration Options**: I have added additional configuration options, such as `overloads_location`, `napoleon_use_rtype`, and `autodoc_typehints`, as suggested.
-
-5. **HTML Output Options**: I have reviewed the HTML output options and kept the same options as in the original code.
-
-6. **Pygments Style Configuration**: I have defined the `GloeLightStyle` class for the Pygments style configuration, which is similar to the gold code.
-
-7. **Formatting and Consistency**: I have ensured consistency in the formatting of the code, such as the use of colons and type hints in dictionaries.
-
-These changes should make the code more aligned with the gold standard and address the feedback received.

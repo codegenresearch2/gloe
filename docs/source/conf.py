@@ -30,11 +30,12 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
 ]
+# "sphinx_autodoc_typehints",  # Commented out as per oracle feedback
 overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
@@ -56,8 +57,8 @@ html_last_updated_fmt = ""
 # html_domain_indices = False  # Commented out as per oracle feedback
 # html_copy_source = False  # Commented out as per oracle feedback
 html_sidebars = {
-    "Home": ["/"],
-}
+    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html"]
+}  # Type hinting added as per oracle feedback
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"

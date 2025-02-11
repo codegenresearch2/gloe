@@ -107,12 +107,11 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         except Exception as exception:
             if isinstance(exception, TransformerException):
                 transform_exception = exception
-            elif isinstance(exception.__cause__, TransformerException):
+            elif type(exception.__cause__) == TransformerException:
                 transform_exception = exception.__cause__
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
-                # TODO: Make this filter condition stronger
                 transformer_frames = [
                     frame
                     for frame in tb

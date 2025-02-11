@@ -38,6 +38,11 @@ def square_root(num: float) -> float:
     return num ** 0.5
 
 
+@transformer
+def add_slash(text: str) -> str:
+    return text + "/"
+
+
 _URL = "http://my-service"
 
 

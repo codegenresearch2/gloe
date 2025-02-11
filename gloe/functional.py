@@ -40,6 +40,20 @@ class _PartialTransformer(Generic[A, P1, S]):
         class LambdaTransformer(Transformer[A, S]):
             """
             Transformer class created from a function with partial application of arguments.
+
+            This class is an internal implementation detail of Gloe and is not intended to be
+            used directly by users. Instead, users should create partial transformers using
+            the `partial_transformer` decorator.
+
+            Args:
+                func: A callable with one or more arguments. The first argument is of
+                    type :code:`A`. The subsequent arguments are retained for use during
+                    transformer instantiation. This callable returns a value of type
+                    :code:`S`.
+
+            Returns:
+                An instance of the :code:`Transformer` class, encapsulating the transformation
+                logic defined in the provided callable with partially applied arguments.
             """
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
@@ -61,6 +75,30 @@ def partial_transformer(
     """
     Decorator to create a partial transformer from a function.
 
+    This decorator allows users to create transformers with partially applied arguments.
+    This capability is particularly useful for creating configurable transformer instances
+    where some arguments are preset, enhancing modularity and reusability in data
+    processing pipelines.
+
+    See Also:
+        For further details on partial transformers and their applications, see
+        :ref:`partial-transformers`.
+
+    Example:
+        Here's how to apply the `@partial_transformer` decorator to create a transformer
+        with a pre-applied argument::
+
+            @partial_transformer
+            def enrich_data(data: Data, enrichment_type: str) -> Data:
+                # Implementation for data enrichment based on the enrichment_type
+                ...
+
+            # Instantiate a transformer with the 'enrichment_type' pre-set
+            enrich_with_metadata = enrich_data(enrichment_type="metadata")
+
+            # Use the partially applied transformer
+            get_enriched_data = get_data >> enrich_with_metadata
+
     Args:
         func: A callable with one or more arguments. The first argument is of
             type :code:`A`. The subsequent arguments are retained for use during
@@ -70,6 +108,8 @@ def partial_transformer(
     Returns:
         An instance of the :code:`_PartialTransformer`, an internal class utilized within
         Gloe that facilitates partial instantiation of transformers by the user.
+        The underlying mechanics of :code:`_PartialTransformer` are managed internally,
+        the user just needs to understand its usage.
     """
     return _PartialTransformer(func)
 
@@ -84,6 +124,21 @@ class _PartialAsyncTransformer(Generic[A, P1, S]):
         class LambdaTransformer(AsyncTransformer[A, S]):
             """
             AsyncTransformer class created from a function with partial application of arguments.
+
+            This class is an internal implementation detail of Gloe and is not intended to be
+            used directly by users. Instead, users should create partial asynchronous transformers
+            using the `partial_async_transformer` decorator.
+
+            Args:
+                func: A callable with one or more arguments, the first of which is of type `A`.
+                    Remaining arguments are preserved for later use during the instantiation of
+                    the transformer. This callable must asynchronously return a result of type
+                    `S`, indicating an operation that produces an output of type `S` upon
+                    completion.
+
+            Returns:
+                An instance of the :code:`AsyncTransformer` class, encapsulating the asynchronous
+                transformation logic defined in the provided callable with partially applied arguments.
             """
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
@@ -105,6 +160,31 @@ def partial_async_transformer(
     """
     Decorator to create a partial async transformer from a function.
 
+    This decorator enables the creation of partial asynchronous transformers, which are
+    transformers capable of partial argument application. Such functionality is invaluable
+    for crafting reusable asynchronous transformer instances where certain arguments are
+    predetermined, enhancing both modularity and reusability within asynchronous data
+    processing flows.
+
+    See Also:
+        For additional insights into partial asynchronous transformers and their practical
+        applications, consult :ref:`partial-async-transformers`.
+
+    Example:
+        Utilize the `@partial_async_transformer` decorator to build a transformer with
+        a pre-set argument::
+
+            @partial_async_transformer
+            async def load_data(user_id: int, data_type: str) -> Data:
+                # Logic for loading data based on user_id and data_type
+                ...
+
+            # Instantiate a transformer with 'data_type' predefined
+            load_user_data = load_data(data_type="user_profile")
+
+            # Subsequent usage requires only the user_id
+            user_data = await load_user_data(user_id=1234)
+
     Args:
         func: A callable with one or more arguments, the first of which is of type `A`.
             Remaining arguments are preserved for later use during the instantiation of
@@ -115,7 +195,8 @@ def partial_async_transformer(
     Returns:
         An instance of the :code:`_PartialAsyncTransformer`, an internally managed class
         within Gloe designed to facilitate the partial instantiation of asynchronous
-        transformers.
+        transformers. Users are encouraged to understand its application, as the
+        underlying mechanics of :code:`_PartialAsyncTransformer` are handled internally.
     """
     return _PartialAsyncTransformer(func)
 
@@ -123,10 +204,27 @@ def transformer(func: Callable[[A], S]) -> Transformer[A, S]:
     """
     Convert a callable to an instance of the Transformer class.
 
+    This function allows users to create transformers from regular functions.
+    Transformers are callable objects that encapsulate a transformation logic.
+    They are designed to be used in data processing pipelines, where they can be
+    composed and executed sequentially.
+
+    See Also:
+        The most common usage is as a decorator. This example demonstrates how to use the
+        `@transformer` decorator to filter a list of users::
+
+    Example:
+        The most common use is as a decorator::
+
+            @transformer
+            def filter_subscribed_users(users: list[User]) -> list[User]:
+               ...
+
+            subscribed_users = filter_subscribed_users(users_list)
+
     Args:
         func: A callable that takes a single argument and returns a result. The callable
             should return an instance of the generic type :code:`S` specified.
-
     Returns:
         An instance of the Transformer class, encapsulating the transformation logic
         defined in the provided callable.
@@ -161,9 +259,25 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
     """
     Convert a callable to an instance of the AsyncTransformer class.
 
+    This function allows users to create asynchronous transformers from asynchronous functions.
+    Asynchronous transformers are callable objects that encapsulate an asynchronous transformation
+    logic. They are designed to be used in asynchronous data processing pipelines, where they can
+    be composed and executed sequentially.
+
+    See Also:
+        For more information about this feature, refer to the :ref:`async-transformers`.
+
+    Example:
+        The most common use is as a decorator::
+
+            @async_transformer
+            async def get_user_by_role(role: str) -> list[User]:
+               ...
+
+            await get_user_by_role("admin")
+
     Args:
         func: A callable that takes a single argument and returns a coroutine.
-
     Returns:
         Returns an instance of the AsyncTransformer class, representing the built async
         transformer.

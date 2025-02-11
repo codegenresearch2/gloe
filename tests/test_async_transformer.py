@@ -10,20 +10,17 @@ _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
 def is_string(value: Any) -> None:
-    if type(value) is not str:
-        raise Exception(f"Expected string, got {type(value).__name__}")
+    if not isinstance(value, str):
+        raise TypeError(f"Expected string, got {type(value).__name__}")
+
+def has_bar_key(data: dict[str, str]) -> None:
+    if "bar" not in data.keys():
+        raise KeyError("'bar' key not found in the dictionary")
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
     await asyncio.sleep(0.1)
     return _DATA
-
-class HasNotBarKey(Exception):
-    pass
-
-def has_bar_key(dict: dict[str, str]) -> None:
-    if "bar" not in dict.keys():
-        raise HasNotBarKey()
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
@@ -62,7 +59,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0.1)
             return _DATA
         pipeline = ensured_request >> forward()
-        with self.assertRaises(HasNotBarKey):
+        with self.assertRaises(KeyError):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
@@ -72,7 +69,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(delay)
             return _DATA
         pipeline = ensured_delayed_request(0.1) >> forward()
-        with self.assertRaises(HasNotBarKey):
+        with self.assertRaises(KeyError):
             await pipeline(_URL)
 
     async def test_async_transformer_wrong_arg(self):

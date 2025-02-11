@@ -9,8 +9,12 @@ _In = TypeVar("_In")
 _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
-def is_string(value: Any) -> bool:
-    return isinstance(value, str)
+class InvalidInputType(Exception):
+    pass
+
+def validate_string(value: Any) -> None:
+    if not isinstance(value, str):
+        raise InvalidInputType(f"Expected string, got {type(value).__name__}")
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
@@ -20,7 +24,7 @@ async def request_data(url: str) -> dict[str, str]:
 class HasNotBarKey(Exception):
     pass
 
-def has_bar_key(dict: dict[str, str]):
+def has_bar_key(dict: dict[str, str]) -> None:
     if "bar" not in dict.keys():
         raise HasNotBarKey()
 
@@ -55,7 +59,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[validate_string], outcome=[has_bar_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -65,7 +69,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[has_bar_key])
+        @ensure(incoming=[validate_string], outcome=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -77,7 +81,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_async_transformer_wrong_arg(self):
         with self.assertWarns(RuntimeWarning):
             @transformer  # type: ignore
-            async def many_args(arg1: str, arg2: int):
+            async def invalid_transformer(arg1: str, arg2: int):
                 return arg1, arg2
 
     async def test_async_transformer_copy(self):
@@ -85,17 +89,17 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(copied_transformer, request_data)
 
     async def test_unsupported_argument(self):
-        def just_a_normal_function():
+        def unsupported_function():
             return None
 
         with self.assertRaises(
             UnsupportedTransformerArgException,
-            msg=f"Unsupported transformer argument: {just_a_normal_function}",
+            msg=f"Unsupported transformer argument: {unsupported_function}",
         ):
-            _ = request_data >> just_a_normal_function  # type: ignore
+            _ = request_data >> unsupported_function  # type: ignore
 
         with self.assertRaises(
             UnsupportedTransformerArgException,
-            msg=f"Unsupported transformer argument: {just_a_normal_function}",
+            msg=f"Unsupported transformer argument: {unsupported_function}",
         ):
-            _ = request_data >> (just_a_normal_function, forward[str]())  # type: ignore
+            _ = request_data >> (unsupported_function, forward[str]())  # type: ignore

@@ -13,11 +13,11 @@ _P1 = ParamSpec('_P1')
 
 class TransformerEnsurer(Generic[_T, _S], ABC):
     @abstractmethod
-    def validate_input(self, data: _T):
+    def validate_input(self, data: _T) -> None:
         """Perform a validation on incoming data before executing the transformer code"""
 
     @abstractmethod
-    def validate_output(self, data: _T, output: _S):
+    def validate_output(self, data: _T, output: _S) -> None:
         """Perform a validation on outcome data after executing the transformer code"""
 
     def __call__(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
@@ -35,10 +35,10 @@ def input_ensurer(func: Callable[[_T], Any]) -> TransformerEnsurer[_T, Any]:
         __doc__ = func.__doc__
         __annotations__ = cast(FunctionType, func).__annotations__
 
-        def validate_input(self, data: _T):
+        def validate_input(self, data: _T) -> None:
             func(data)
 
-        def validate_output(self, data: _T, output: Any):
+        def validate_output(self, data: _T, output: Any) -> None:
             pass
 
     return LambdaEnsurer()
@@ -56,10 +56,10 @@ def output_ensurer(func: Callable) -> TransformerEnsurer:
         __doc__ = func.__doc__
         __annotations__ = cast(FunctionType, func).__annotations__
 
-        def validate_input(self, data: Any):
+        def validate_input(self, data: Any) -> None:
             pass
 
-        def validate_output(self, data: Any, output: Any):
+        def validate_output(self, data: Any, output: Any) -> None:
             if len(inspect.signature(func).parameters) == 1:
                 func(output)
             else:

@@ -1,13 +1,12 @@
 import asyncio
 import types
 from inspect import Signature
-from types import GenericAlias
 from typing import TypeVar, Any, cast
 
 from gloe.async_transformer import AsyncTransformer
 from gloe.base_transformer import BaseTransformer
 from gloe.transformers import Transformer
-from gloe._utils import _match_types, _specify_types
+from gloe._utils import _match_types, _specify_types, awaitify
 from gloe.exceptions import UnsupportedTransformerArgException
 
 _In = TypeVar("_In")
@@ -16,8 +15,6 @@ _NextOut = TypeVar("_NextOut")
 
 
 def is_transformer(node):
-    if type(node) == list or type(node) == tuple:
-        return all(is_transformer(n) for n in node)
     return isinstance(node, Transformer)
 
 
@@ -136,7 +133,7 @@ def _nerge_serial(transformer1, _transformer2):
         new_transformer = NewTransformer4()
 
     else:
-        raise UnsupportedTransformerArgException(transformer2)
+        raise UnsupportedTransformerArgException(_transformer2)
 
     return _resolve_new_merge_transformers(new_transformer, transformer2)
 
@@ -176,14 +173,11 @@ def _merge_diverging(
         )
         receiving_signatures.append(new_signature)
 
-        def _signature(_) -> Signature:
-            return new_signature
-
         if receiving_transformer._previous == incident_transformer:
             setattr(
                 receiving_transformer,
                 "signature",
-                types.MethodType(_signature, receiving_transformer),
+                types.MethodType(new_signature, receiving_transformer),
             )
 
     class BaseNewTransformer:
@@ -192,7 +186,7 @@ def _merge_diverging(
                 r.return_annotation for r in receiving_signatures
             ]
             new_signature = incident_signature.replace(
-                return_annotation=GenericAlias(tuple, tuple(receiving_signature_returns))
+                return_annotation=tuple(receiving_signature_returns)
             )
             return new_signature
 
@@ -262,7 +256,7 @@ def _compose_nodes(
     if issubclass(type(current), BaseTransformer):
         if issubclass(type(next_node), BaseTransformer):
             return _nerge_serial(current, next_node)  # type: ignore
-        elif type(next_node) == tuple:
+        elif isinstance(next_node, tuple):
             is_all_base_transformers = all(
                 issubclass(type(next_transformer), BaseTransformer)
                 for next_transformer in next_node

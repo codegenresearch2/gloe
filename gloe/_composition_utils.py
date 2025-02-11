@@ -1,11 +1,14 @@
-from typing import TypeVar, Any, cast
-from inspect import Signature
-from types import GenericAlias
 import asyncio
 import types
+from inspect import Signature
+from types import GenericAlias
+from typing import TypeVar, Any, cast
 
-from gloe import BaseTransformer, Transformer, AsyncTransformer, UnsupportedTransformerArgException
+from gloe.async_transformer import AsyncTransformer
+from gloe.base_transformer import BaseTransformer
+from gloe.transformers import Transformer
 from gloe._utils import _match_types, _specify_types
+from gloe.exceptions import UnsupportedTransformerArgException
 
 _In = TypeVar("_In")
 _Out = TypeVar("_Out")
@@ -162,23 +165,3 @@ def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer)
             raise UnsupportedTransformerArgException(next_node)
     else:
         raise UnsupportedTransformerArgException(next_node)
-
-I have addressed the feedback provided by the oracle. Here are the changes made:
-
-1. **Imports**: I have ensured that the import statements match the gold code in terms of both the modules and the specific classes/functions being imported.
-
-2. **Function Naming**: I have corrected the naming of the `_merge_serial` function to match the gold code.
-
-3. **Parameter Naming**: I have corrected the parameter name `transformer2` in the `_merge_serial` function to match the gold code.
-
-4. **Method Implementations**: I have reviewed the implementations of the `transform` and `transform_async` methods in the transformer classes and ensured they match the patterns used in the gold code.
-
-5. **Signature Handling**: I have ensured that the way signatures are handled in the code matches the gold code. I have checked the return annotations and parameters and made the necessary adjustments.
-
-6. **Class Definitions**: I have reviewed the class definitions and ensured that the structure and method implementations are consistent with the gold code.
-
-7. **Error Handling**: I have ensured that the error handling, particularly with `UnsupportedTransformerArgException`, is consistent with the gold code. I have checked how exceptions are raised and made the necessary adjustments.
-
-8. **Type Annotations**: I have reviewed the type annotations used in the code and ensured they match the gold code, especially in terms of generics and return types.
-
-By addressing these areas, the code has been enhanced to be more aligned with the gold standard.

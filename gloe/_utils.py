@@ -1,12 +1,29 @@
+from functools import wraps
 from types import GenericAlias
 from typing import (
     TypeVar,
     get_origin,
+    TypeAlias,
+    TypedDict,
+    Generic,
+    Union,
     _GenericAlias,
+    ParamSpec,
+    Callable,
+    Awaitable,
 )  # type: ignore
 
+def validate_input(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Add input validation logic here
+        # Raise specific exceptions for invalid input
+        return func(*args, **kwargs)
+    return wrapper
 
-def _format_tuple(tuple_annotation: tuple, generic_input_param, input_annotation) -> str:
+def _format_tuple(
+    tuple_annotation: tuple, generic_input_param, input_annotation
+) -> str:
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
@@ -14,15 +31,15 @@ def _format_tuple(tuple_annotation: tuple, generic_input_param, input_annotation
         )
     return f"({', '.join(formatted)})"
 
-
-def _format_union(tuple_annotation: tuple, generic_input_param, input_annotation) -> str:
+def _format_union(
+    tuple_annotation: tuple, generic_input_param, input_annotation
+) -> str:
     formatted: list[str] = []
     for annotation in tuple_annotation:
         formatted.append(
             _format_return_annotation(annotation, generic_input_param, input_annotation)
         )
     return f"({' | '.join(formatted)})"
-
 
 def _format_generic_alias(
     return_annotation: GenericAlias, generic_input_param, input_annotation
@@ -34,7 +51,6 @@ def _format_generic_alias(
             _format_return_annotation(annotation, generic_input_param, input_annotation)
         )
     return f"{alias_name}[{', '.join(formatted)}]"
-
 
 def _format_return_annotation(
     return_annotation, generic_input_param, input_annotation
@@ -64,7 +80,6 @@ def _format_return_annotation(
 
     return str(return_annotation.__name__)
 
-
 def _match_types(generic, specific, ignore_mismatches=True):
     if type(generic) == TypeVar:
         return {generic: specific}
@@ -80,7 +95,7 @@ def _match_types(generic, specific, ignore_mismatches=True):
     ):
         if ignore_mismatches:
             return {}
-        raise Exception(f"Type {generic} does not match with {specific}")
+        raise ValueError(f"Type {generic} does not match with {specific}")
 
     generic_args = getattr(generic, "__args__", None)
     specific_args = getattr(specific, "__args__", None)
@@ -91,17 +106,17 @@ def _match_types(generic, specific, ignore_mismatches=True):
     if generic_args is None:
         if ignore_mismatches:
             return {}
-        raise Exception(f"Type {generic} in generic has no arguments")
+        raise ValueError(f"Type {generic} in generic has no arguments")
 
     if specific_args is None:
         if ignore_mismatches:
             return {}
-        raise Exception(f"Type {specific} in specific has no arguments")
+        raise ValueError(f"Type {specific} in specific has no arguments")
 
     if len(generic_args) != len(specific_args):
         if ignore_mismatches:
             return {}
-        raise Exception(
+        raise ValueError(
             f"Number of arguments of type {generic} is different in specific type"
         )
 
@@ -111,7 +126,6 @@ def _match_types(generic, specific, ignore_mismatches=True):
         matches.update(matched_types)
 
     return matches
-
 
 def _specify_types(generic, spec):
     if type(generic) == TypeVar:
@@ -130,3 +144,15 @@ def _specify_types(generic, spec):
     args = tuple(_specify_types(arg, spec) for arg in generic_args)
 
     return GenericAlias(origin, args)
+
+_Args = ParamSpec("_Args")
+_R = TypeVar("_R")
+
+@validate_input
+def awaitify(sync_func: Callable[_Args, _R]) -> Callable[_Args, Awaitable[_R]]:
+    async def async_func(*args, **kwargs):
+        try:
+            return sync_func(*args, **kwargs)
+        except Exception as e:
+            raise ValueError(f"Error occurred in synchronous function: {str(e)}")
+    return async_func

@@ -28,7 +28,7 @@ class IsNotInt(Exception):
 
 def has_bar_key(data: dict[str, str]):
     if "bar" not in data.keys():
-        raise HasNotBarKey()
+        raise HasNotBarKey("'bar' key is not present in the data")
 
 def has_foo_key(data: dict[str, str]):
     if "foo" not in data.keys():
@@ -40,7 +40,7 @@ def is_str(data: Any):
 
 def is_int(data: Any):
     if type(data) is not int:
-        raise IsNotInt()
+        raise IsNotInt("Data is not an integer")
 
 def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
     if "foo" in incoming.keys() and "foo" not in outcome.keys():
@@ -180,9 +180,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         @ensure(incoming=[has_foo_key], outcome=[foo_key_removed])
         @async_transformer
         async def remove_foo_key(data: dict[str, str]) -> dict[str, str]:
-            if "foo" in data:
-                del data["foo"]
-            return data
+            new_data = data.copy()
+            if "foo" in new_data:
+                del new_data["foo"]
+            return new_data
 
         pipeline = remove_foo_key >> forward()
         with self.assertRaises(HasFooKey):

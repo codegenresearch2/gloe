@@ -1,7 +1,7 @@
 import traceback
 from abc import ABC, abstractmethod
 from inspect import Signature
-from typing import TypeVar, overload, cast, Any, Union
+from typing import TypeVar, overload, cast, Any, TypeAlias, Union
 
 from gloe.base_transformer import BaseTransformer, TransformerException
 from gloe.async_transformer import AsyncTransformer
@@ -18,9 +18,9 @@ O5 = TypeVar("O5")
 O6 = TypeVar("O6")
 O7 = TypeVar("O7")
 
-Tr = "Transformer"
-AT = AsyncTransformer
-BT = BaseTransformer[I, O, Any]
+Tr: TypeAlias = "Transformer"
+AT: TypeAlias = AsyncTransformer
+BT: TypeAlias = BaseTransformer[I, O, Any]
 
 AsyncNext2 = Union[
     tuple[AT[O, O1], BT[O, O2]],
@@ -36,12 +36,28 @@ AsyncNext3 = Union[
 # ... (other AsyncNext types)
 
 class Transformer(BaseTransformer[I, O, Tr], ABC):
+    """
+    A Transformer is the generic block with the responsibility to take an input of type
+    `T` and transform it to an output of type `S`.
+
+    See Also:
+        Read more about this feature in the page :ref:`creating-a-transformer`.
+
+    Example:
+        Typical usage example::
+
+            class Stringifier(Transformer[dict, str]):
+                ...
+
+    """
+
     def __init__(self):
         super().__init__()
         self.__class__.__annotations__ = self.transform.__annotations__
 
     @abstractmethod
     def transform(self, data: I) -> O:
+        """Main method to be implemented and responsible to perform the transformer logic"""
         pass
 
     def signature(self) -> Signature:

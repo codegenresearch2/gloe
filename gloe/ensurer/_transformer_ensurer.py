@@ -31,10 +31,10 @@ class TransformerEnsurer(Generic[_T, _S], ABC):
         pass
 
     def __call__(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        def transform(data: _T) -> _S:
-            self.validate_input(data)
-            output = transformer.transform(data)
-            self.validate_output(data, output)
+        def transform(*args: Any, **kwargs: Any) -> _S:
+            self.validate_input(args[0])
+            output = transformer.transform(*args, **kwargs)
+            self.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform)
@@ -129,20 +129,20 @@ class _ensure_incoming(Generic[_T], _ensure_base):
         self.input_ensurers_instances = [input_ensurer(ensurer) for ensurer in incoming]
 
     def _generate_new_transformer(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        def transform(data: _T) -> _S:
+        def transform(*args: Any, **kwargs: Any) -> _S:
             for ensurer in self.input_ensurers_instances:
-                ensurer.validate_input(data)
-            output = transformer.transform(data)
+                ensurer.validate_input(args[0])
+            output = transformer.transform(*args, **kwargs)
             return output
 
         transformer_cp = transformer.copy(transform)
         return transformer_cp
 
     def _generate_new_async_transformer(self, transformer: AsyncTransformer[_T, _S]) -> AsyncTransformer[_T, _S]:
-        async def transform_async(data: _T) -> _S:
+        async def transform_async(*args: Any, **kwargs: Any) -> _S:
             for ensurer in self.input_ensurers_instances:
-                ensurer.validate_input(data)
-            output = await transformer.transform_async(data)
+                ensurer.validate_input(args[0])
+            output = await transformer.transform_async(*args, **kwargs)
             return output
 
         transformer_cp = transformer.copy(transform_async)
@@ -153,20 +153,20 @@ class _ensure_outcome(Generic[_S], _ensure_base):
         self.output_ensurers_instances = [output_ensurer(ensurer) for ensurer in incoming]
 
     def _generate_new_transformer(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        def transform(data: _T) -> _S:
-            output = transformer.transform(data)
+        def transform(*args: Any, **kwargs: Any) -> _S:
+            output = transformer.transform(*args, **kwargs)
             for ensurer in self.output_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform)
         return transformer_cp
 
     def _generate_new_async_transformer(self, transformer: AsyncTransformer[_T, _S]) -> AsyncTransformer[_T, _S]:
-        async def transform_async(data: _T) -> _S:
-            output = await transformer.transform_async(data)
+        async def transform_async(*args: Any, **kwargs: Any) -> _S:
+            output = await transformer.transform_async(*args, **kwargs)
             for ensurer in self.output_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform_async)
@@ -177,20 +177,20 @@ class _ensure_changes(Generic[_T, _S], _ensure_base):
         self.changes_ensurers_instances = [output_ensurer(ensurer) for ensurer in changes]
 
     def _generate_new_transformer(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        def transform(data: _T) -> _S:
-            output = transformer.transform(data)
+        def transform(*args: Any, **kwargs: Any) -> _S:
+            output = transformer.transform(*args, **kwargs)
             for ensurer in self.changes_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform)
         return transformer_cp
 
     def _generate_new_async_transformer(self, transformer: AsyncTransformer[_T, _S]) -> AsyncTransformer[_T, _S]:
-        async def transform_async(data: _T) -> _S:
-            output = await transformer.transform_async(data)
+        async def transform_async(*args: Any, **kwargs: Any) -> _S:
+            output = await transformer.transform_async(*args, **kwargs)
             for ensurer in self.changes_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform_async)
@@ -208,24 +208,24 @@ class _ensure_both(Generic[_T, _S], _ensure_base):
         self.output_ensurers_instances = self.output_ensurers_instances + [output_ensurer(ensurer) for ensurer in changes_seq]
 
     def _generate_new_transformer(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        def transform(data: _T) -> _S:
+        def transform(*args: Any, **kwargs: Any) -> _S:
             for ensurer in self.input_ensurers_instances:
-                ensurer.validate_input(data)
-            output = transformer.transform(data)
+                ensurer.validate_input(args[0])
+            output = transformer.transform(*args, **kwargs)
             for ensurer in self.output_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform)
         return transformer_cp
 
     def _generate_new_async_transformer(self, transformer: AsyncTransformer[_T, _S]) -> AsyncTransformer[_T, _S]:
-        async def transform_async(data: _T) -> _S:
+        async def transform_async(*args: Any, **kwargs: Any) -> _S:
             for ensurer in self.input_ensurers_instances:
-                ensurer.validate_input(data)
-            output = await transformer.transform_async(data)
+                ensurer.validate_input(args[0])
+            output = await transformer.transform_async(*args, **kwargs)
             for ensurer in self.output_ensurers_instances:
-                ensurer.validate_output(data, output)
+                ensurer.validate_output(args[0], output)
             return output
 
         transformer_cp = transformer.copy(transform_async)

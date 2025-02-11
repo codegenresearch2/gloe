@@ -8,6 +8,7 @@ from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_a
 from uuid import UUID
 from itertools import groupby
 from networkx import DiGraph, Graph
+import networkx as nx
 
 from gloe._utils import _format_return_annotation
 

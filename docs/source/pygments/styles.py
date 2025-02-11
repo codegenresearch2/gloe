@@ -12,7 +12,7 @@ from pygments.token import (
     Whitespace,
 )
 
-# Class name and style name match the naming convention used in the gold code
+# Class names and style names match the exact naming convention used in the gold code
 class GloeDarkStyle(Style):
     name = "dark"
 
@@ -56,7 +56,7 @@ class GloeDarkStyle(Style):
         Error: "bg:#e3d2d2 #a61717",
     }
 
-# Class name and style name match the naming convention used in the gold code
+# Class names and style names match the exact naming convention used in the gold code
 class GloeLightStyle(Style):
     name = "light"
 
@@ -101,6 +101,6 @@ class GloeLightStyle(Style):
         Error: "bg:#ffdddd #a61717",
     }
 
-# Pygments style references match the naming convention used in the gold code
+# Pygments style references match the exact naming convention used in the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
 pygments_light_style = "styles.GloeLightStyle"

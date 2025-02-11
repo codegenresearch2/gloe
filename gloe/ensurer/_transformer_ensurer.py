@@ -15,11 +15,11 @@ _P1 = ParamSpec("_P1")
 class TransformerEnsurer(Generic[_T, _S], ABC):
     @abstractmethod
     def validate_input(self, data: _T):
-        """Perform a validation on incoming data before execute the transformer code"""
+        """Perform a validation on incoming data before executing the transformer code"""
 
     @abstractmethod
     def validate_output(self, data: _T, output: _S):
-        """Perform a validation on outcome data after execute the transformer code"""
+        """Perform a validation on outcome data after executing the transformer code"""
 
     def __call__(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
         def transform(this: Transformer, data: _T) -> _S:

@@ -330,9 +330,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
                 if previous.previous is None:
                     return previous
 
-                if type(previous.previous) == tuple:
-                    return previous.previous
-
                 return previous.visible_previous
             else:
                 return previous

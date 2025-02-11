@@ -1,7 +1,7 @@
 import asyncio
 import types
 from inspect import Signature
-from typing import TypeVar, Any, cast
+from typing import TypeVar, Any, cast, Tuple, List
 
 from gloe.async_transformer import AsyncTransformer
 from gloe.base_transformer import BaseTransformer
@@ -15,6 +15,8 @@ _NextOut = TypeVar("_NextOut")
 
 
 def is_transformer(node):
+    if isinstance(node, (list, tuple)):
+        return all(is_transformer(n) for n in node)
     return isinstance(node, Transformer)
 
 
@@ -22,7 +24,7 @@ def is_async_transformer(node):
     return isinstance(node, AsyncTransformer)
 
 
-def has_any_async_transformer(node: list):
+def has_any_async_transformer(node: List):
     return any(is_async_transformer(n) for n in node)
 
 
@@ -52,11 +54,11 @@ def _resolve_serial_connection_signatures(
     return new_signature
 
 
-def _nerge_serial(transformer1, _transformer2):
+def _nerge_serial(transformer1, transformer2):
     if transformer1.previous is None:
         transformer1 = transformer1.copy(regenerate_instance_id=True)
 
-    transformer2 = _transformer2.copy(regenerate_instance_id=True)
+    transformer2 = transformer2.copy(regenerate_instance_id=True)
     transformer2._set_previous(transformer1)
 
     signature1: Signature = transformer1.signature()
@@ -91,7 +93,7 @@ def _nerge_serial(transformer1, _transformer2):
             return len(transformer1) + len(transformer2)
 
     new_transformer: BaseTransformer | None = None
-    if is_transformer(transformer1) and is_transformer(_transformer2):
+    if is_transformer(transformer1) and is_transformer(transformer2):
 
         class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
@@ -102,7 +104,7 @@ def _nerge_serial(transformer1, _transformer2):
 
         new_transformer = NewTransformer1()
 
-    elif is_async_transformer(transformer1) and is_transformer(_transformer2):
+    elif is_async_transformer(transformer1) and is_transformer(transformer2):
 
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
@@ -122,7 +124,7 @@ def _nerge_serial(transformer1, _transformer2):
 
         new_transformer = NewTransformer3()
 
-    elif is_transformer(transformer1) and is_async_transformer(_transformer2):
+    elif is_transformer(transformer1) and is_async_transformer(transformer2):
 
         class NewTransformer4(AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
@@ -133,7 +135,7 @@ def _nerge_serial(transformer1, _transformer2):
         new_transformer = NewTransformer4()
 
     else:
-        raise UnsupportedTransformerArgException(_transformer2)
+        raise UnsupportedTransformerArgException(transformer2)
 
     return _resolve_new_merge_transformers(new_transformer, transformer2)
 
@@ -156,7 +158,7 @@ def _merge_diverging(
         receiving_transformer._set_previous(incident_transformer)
 
     incident_signature: Signature = incident_transformer.signature()
-    receiving_signatures: list[Signature] = []
+    receiving_signatures: List[Signature] = []
 
     for receiving_transformer in receiving_transformers:
         generic_vars = _match_types(
@@ -186,7 +188,7 @@ def _merge_diverging(
                 r.return_annotation for r in receiving_signatures
             ]
             new_signature = incident_signature.replace(
-                return_annotation=tuple(receiving_signature_returns)
+                return_annotation=Tuple[tuple(receiving_signature_returns)]
             )
             return new_signature
 
@@ -197,7 +199,7 @@ def _merge_diverging(
     new_transformer = None
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
 
-        def split_result(data: _In) -> tuple[Any, ...]:
+        def split_result(data: _In) -> Tuple[Any, ...]:
             intermediate_result = incident_transformer(data)
 
             outputs = []
@@ -207,15 +209,15 @@ def _merge_diverging(
 
             return tuple(outputs)
 
-        class NewTransformer1(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
-            def transform(self, data: _In) -> tuple[Any, ...]:
+        class NewTransformer1(BaseNewTransformer, Transformer[_In, Tuple[Any, ...]]):
+            def transform(self, data: _In) -> Tuple[Any, ...]:
                 return split_result(data)
 
         new_transformer = NewTransformer1()
 
     else:
 
-        async def split_result_async(data: _In) -> tuple[Any, ...]:
+        async def split_result_async(data: _In) -> Tuple[Any, ...]:
             if asyncio.iscoroutinefunction(incident_transformer.__call__):
                 intermediate_result = await incident_transformer(data)
             else:
@@ -231,8 +233,8 @@ def _merge_diverging(
 
             return tuple(outputs)
 
-        class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
-            async def transform_async(self, data: _In) -> tuple[Any, ...]:
+        class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, Tuple[Any, ...]]):
+            async def transform_async(self, data: _In) -> Tuple[Any, ...]:
                 return await split_result_async(data)
 
         new_transformer = NewTransformer2()
@@ -251,7 +253,7 @@ def _merge_diverging(
 
 def _compose_nodes(
     current: BaseTransformer,
-    next_node: tuple | BaseTransformer,
+    next_node: Tuple[BaseTransformer, ...] | BaseTransformer,
 ):
     if issubclass(type(current), BaseTransformer):
         if issubclass(type(next_node), BaseTransformer):

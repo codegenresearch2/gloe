@@ -54,10 +54,12 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         return f"{self.input_annotation} -> ({type(self).__name__}) -> {self.output_annotation}"
 
     async def __call__(self, data: _In) -> _Out:
+        transform_exception = None
+
         try:
             transformed = await self.transform_async(data)
         except TransformerException as e:
-            raise e
+            transform_exception = e
         except Exception as e:
             tb = traceback.extract_tb(e.__traceback__)
             transformer_frames = [frame for frame in tb if frame.name == self.__class__.__name__ or frame.name == "transform"]
@@ -68,16 +70,19 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
             else:
                 exception_message = f'An error occurred in transformer "{self.__class__.__name__}"'
 
-            raise AsyncTransformerException(
+            transform_exception = AsyncTransformerException(
                 internal_exception=e,
                 raiser_transformer=self,
                 message=exception_message,
             )
 
-        if transformed is None:
-            raise ValueError("Transformed data cannot be None")
+        if transform_exception is not None:
+            raise transform_exception
 
-        return transformed
+        if type(transformed) is not None:
+            return cast(_Out, transformed)
+
+        raise NotImplementedError
 
     def copy(self, transform: Callable[[BaseTransformer, _In], Awaitable[_Out]] | None = None, regenerate_instance_id: bool = False) -> "AsyncTransformer[_In, _Out]":
         copied = copy.copy(self)
@@ -135,21 +140,3 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
             return _compose_nodes(self, next_node)
         else:
             raise UnsupportedTransformerArgException(next_node)
-
-I have addressed the feedback provided by the oracle. Here are the changes made:
-
-1. **Exception Handling**: I have simplified the exception handling in the `__call__` method. I removed the unnecessary `transform_exception` variable and directly raised the `AsyncTransformerException` when a general exception is caught.
-
-2. **Return Types**: I added a check for `None` in the `__call__` method and raised a `ValueError` if the transformed data is `None`.
-
-3. **Type Annotations**: I have ensured that the type annotations are consistent with the expected output structure.
-
-4. **Code Structure**: I have simplified the method definitions and overloads to match the expected input and output types.
-
-5. **Redundant Code**: I have removed any redundant or unnecessary code to improve readability and maintainability.
-
-6. **Comments and Documentation**: I have ensured that the comments and docstrings are clear and concise.
-
-7. **Use of `cast`**: I have reviewed the use of `cast` and ensured that it is used appropriately to maintain type safety.
-
-These changes should help align the code more closely with the gold code and improve its overall quality.

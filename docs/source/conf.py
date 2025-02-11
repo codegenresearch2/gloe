@@ -22,7 +22,7 @@ extensions = [
     # "sphinx.ext.autosummary",  # Commented out in gold code
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    # "sphinx.ext.intersphinx",  # Commented out in gold code
+    "sphinx.ext.intersphinx",  # Added based on gold code
     "sphinxext.opengraph",
     # "sphinx_autodoc_typehints",  # Commented out in gold code
     "myst_parser",
@@ -32,7 +32,7 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out in gold code
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Added based on gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 

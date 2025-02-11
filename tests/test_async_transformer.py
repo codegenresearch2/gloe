@@ -14,7 +14,7 @@ async def request_data(url: str) -> dict[str, str]:
     await asyncio.sleep(0.1)
     return _DATA
 
-class HasNotFooKey(Exception):
+class HasNotBarKey(Exception):
     pass
 
 class HasFooKey(Exception):
@@ -25,22 +25,22 @@ class IsNotInt(Exception):
 
 def has_bar_key(data: dict[str, str]):
     if "bar" not in data.keys():
-        raise HasNotFooKey("The 'bar' key is not present in the dictionary.")
+        raise HasNotBarKey("The 'bar' key is not present in the dictionary.")
 
 def has_foo_key(data: dict[str, str]):
     if "foo" not in data.keys():
-        raise HasNotFooKey("The 'foo' key is not present in the dictionary.")
+        raise HasNotBarKey("The 'foo' key is not present in the dictionary.")
 
-def foo_key_removed(data: dict[str, str]):
-    if "foo" in data.keys():
+def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
+    if "foo" in incoming.keys() or "foo" in outcome.keys():
         raise HasFooKey("The 'foo' key is still present in the dictionary.")
 
 def is_str(data: Any):
-    if not isinstance(data, str):
+    if type(data) is not str:
         raise TypeError("Data is not a string.")
 
 def is_int(data: Any):
-    if not isinstance(data, int):
+    if type(data) is not int:
         raise IsNotInt("Data is not an integer.")
 
 _URL = "http://my-service"
@@ -100,7 +100,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_request >> forward()
 
-        with self.assertRaises(HasNotFooKey):
+        with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
@@ -112,7 +112,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_delayed_request(0.1) >> forward()
 
-        with self.assertRaises(HasNotFooKey):
+        with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
 
     async def test_ensure_async_transformer_int(self):

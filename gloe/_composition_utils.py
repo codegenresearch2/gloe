@@ -66,11 +66,15 @@ def _merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
     new_transformer: BaseTransformer | None = None
     if is_transformer(transformer1) and is_transformer(transformer2):
         class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
-            def transform(self, data: _In) -> _NextOut:
+            async def _transform(self, data: _In) -> _NextOut:
                 intermediate_result = await transformer1.__call__(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
                 return await transformer2.__call__(intermediate_result)
+
+            def transform(self, data: _In) -> _NextOut:
+                return asyncio.run(self._transform(data))
+
         new_transformer = NewTransformer1()
 
     elif is_async_transformer(transformer1) and is_transformer(transformer2):
@@ -80,6 +84,7 @@ def _merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
                 return await transformer2.__call__(intermediate_result)
+
         new_transformer = NewTransformer2()
 
     elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
@@ -89,15 +94,20 @@ def _merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
                 return await transformer2.__call__(intermediate_result)
+
         new_transformer = NewTransformer3()
 
     elif is_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer4(AsyncTransformer[_In, _NextOut]):
-            async def transform_async(self, data: _In) -> _NextOut:
+            async def _transform(self, data: _In) -> _NextOut:
                 intermediate_result = await transformer1.__call__(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
                 return await transformer2.__call__(intermediate_result)
+
+            async def transform_async(self, data: _In) -> _NextOut:
+                return await self._transform(data)
+
         new_transformer = NewTransformer4()
 
     else:
@@ -142,14 +152,14 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
 
     new_transformer = None
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
-        def split_result(data: _In) -> tuple[Any, ...]:
+        async def split_result(data: _In) -> tuple[Any, ...]:
             intermediate_result = await incident_transformer.__call__(data)
             outputs = [await receiving_transformer.__call__(intermediate_result) for receiving_transformer in receiving_transformers]
             return tuple(outputs)
 
         class NewTransformer1(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
             def transform(self, data: _In) -> tuple[Any, ...]:
-                return split_result(data)
+                return asyncio.run(split_result(data))
 
         new_transformer = NewTransformer1()
 
@@ -172,7 +182,7 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
 
     return new_transformer
 
-def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer):
+async def _compose_nodes_async(current: BaseTransformer, next_node: tuple | BaseTransformer):
     if issubclass(type(current), BaseTransformer):
         if issubclass(type(next_node), BaseTransformer):
             return _merge_serial(current, next_node)
@@ -187,3 +197,6 @@ def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer)
             raise UnsupportedTransformerArgException(next_node)
     else:
         raise UnsupportedTransformerArgException(next_node)
+
+def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer):
+    return asyncio.run(_compose_nodes_async(current, next_node))

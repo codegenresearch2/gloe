@@ -68,12 +68,28 @@ AsyncNext7 = Union[
 ]
 
 class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
+    """
+    A Transformer is the generic block with the responsibility to take an input of type
+    `T` and transform it to an output of type `S`.
+
+    See Also:
+        Read more about this feature in the page :ref:`creating-a-transformer`.
+
+    Example:
+        Typical usage example::
+
+            class Stringifier(Transformer[dict, str]):
+                ...
+
+    """
+
     def __init__(self):
         super().__init__()
         self.__class__.__annotations__ = self.transform.__annotations__
 
     @abstractmethod
     def transform(self, data: I) -> O:
+        """Main method to be implemented and responsible to perform the transformer logic"""
         pass
 
     def signature(self) -> Signature:
@@ -91,8 +107,6 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         except Exception as exception:
             if isinstance(exception, TransformerException):
                 transform_exception = exception
-            elif isinstance(exception.__cause__, TransformerException):
-                transform_exception = exception.__cause__
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
@@ -232,5 +246,5 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         pass
 
     def __rshift__(self, next_node):
-        from gloe._composition_utils import _compose_nodes
-        return _compose_nodes(self, next_node)
+        # TODO: Implement this method
+        pass

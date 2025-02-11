@@ -54,21 +54,21 @@ def _resolve_serial_connection_signatures(
     return new_signature
 
 
-def _nerge_serial(transformer1: BaseTransformer, _transformer2: BaseTransformer) -> BaseTransformer:
+def _nerge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer) -> BaseTransformer:
     if transformer1.previous is None:
         transformer1 = transformer1.copy(regenerate_instance_id=True)
 
-    _transformer2 = _transformer2.copy(regenerate_instance_id=True)
-    _transformer2._set_previous(transformer1)
+    transformer2 = transformer2.copy(regenerate_instance_id=True)
+    transformer2._set_previous(transformer1)
 
     signature1: Signature = transformer1.signature()
-    signature2: Signature = _transformer2.signature()
+    signature2: Signature = transformer2.signature()
 
     input_generic_vars = _match_types(
-        _transformer2.input_type, signature1.return_annotation
+        transformer2.input_type, signature1.return_annotation
     )
     output_generic_vars = _match_types(
-        signature1.return_annotation, _transformer2.input_type
+        signature1.return_annotation, transformer2.input_type
     )
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
@@ -86,8 +86,55 @@ def _nerge_serial(transformer1: BaseTransformer, _transformer2: BaseTransformer)
     class BaseNewTransformer:
         def signature(self) -> Signature:
             return _resolve_serial_connection_signatures(
-                _transformer2, generic_vars, signature2
+                transformer2, generic_vars, signature2
             )
 
         def __len__(self):
-            return len(transformer1) + len(
+            return len(transformer1) + len(transformer2)
+
+    new_transformer: BaseTransformer | None = None
+    if is_transformer(transformer1) and is_transformer(transformer2):
+
+        class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
+            def transform(self, data: _In) -> _NextOut:
+                transformer2_call = transformer2.__call__
+                transformer1_call = transformer1.__call__
+                transformed = transformer2_call(transformer1_call(data))
+                return transformed
+
+        new_transformer = NewTransformer1()
+
+    elif is_async_transformer(transformer1) and is_transformer(transformer2):
+
+        class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
+            async def transform_async(self, data: _In) -> _NextOut:
+                transformer1_out = await transformer1(data)
+                transformed = transformer2(transformer1_out)
+                return transformed
+
+        new_transformer = NewTransformer2()
+
+    elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
+
+        class NewTransformer3(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
+            async def transform_async(self, data: _In) -> _NextOut:
+                transformer1_out = await transformer1(data)
+                transformed = await transformer2(transformer1_out)
+                return transformed
+
+        new_transformer = NewTransformer3()
+
+    elif is_transformer(transformer1) and is_async_transformer(transformer2):
+
+        class NewTransformer4(AsyncTransformer[_In, _NextOut]):
+            async def transform_async(self, data: _In) -> _NextOut:
+                transformer1_out = transformer1(data)
+                transformed = await transformer2(transformer1_out)
+                return transformed
+
+        new_transformer = NewTransformer4()
+
+    else:
+        raise UnsupportedTransformerArgException(transformer2)
+
+    return _resolve_new_merge_transformers(new_transformer, transformer2)

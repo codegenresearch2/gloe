@@ -17,64 +17,21 @@ __all__ = ["Transformer"]
 
 I = TypeVar("I")
 O = TypeVar("O")
-O1 = TypeVar("O1")
-O2 = TypeVar("O2")
-O3 = TypeVar("O3")
-O4 = TypeVar("O4")
-O5 = TypeVar("O5")
-O6 = TypeVar("O6")
-O7 = TypeVar("O7")
-
 
 Tr: TypeAlias = "Transformer"
 AT: TypeAlias = AsyncTransformer
 BT: TypeAlias = BaseTransformer[I, O, Any]
 
 AsyncNext2 = Union[
-    tuple[AT[O, O1], BT[O, O2]],
-    tuple[BT[O, O1], AT[O, O2]],
+    tuple[AT[O, O], BT[O, O]],
+    tuple[BT[O, O], AT[O, O]],
 ]
 
 AsyncNext3 = Union[
-    tuple[AT[O, O1], BT[O, O2], BT[O, O3]],
-    tuple[BT[O, O1], AT[O, O2], BT[O, O3]],
-    tuple[BT[O, O1], BT[O, O2], AT[O, O3]],
+    tuple[AT[O, O], BT[O, O], BT[O, O]],
+    tuple[BT[O, O], AT[O, O], BT[O, O]],
+    tuple[BT[O, O], BT[O, O], AT[O, O]],
 ]
-
-AsyncNext4 = Union[
-    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4]],
-    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4]],
-    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4]],
-]
-
-AsyncNext5 = Union[
-    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5]],
-    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5]],
-    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5]],
-]
-
-AsyncNext6 = Union[
-    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
-    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
-    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5], BT[O, O6]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5], BT[O, O6]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], AT[O, O6]],
-]
-
-AsyncNext7 = Union[
-    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5], BT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], AT[O, O6], BT[O, O7]],
-    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], AT[O, O7]],
-]
-
 
 class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
     """
@@ -89,7 +46,6 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
 
             class Stringifier(Transformer[dict, str]):
                 ...
-
     """
 
     def __init__(self):
@@ -137,267 +93,525 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
             )
 
     @overload
-    def __rshift__(
-        self,
-        next_node: tuple["Tr[O, O1]", "Tr[O, O2]"],
-    ) -> "Tr[I, tuple[O1, O2]]":
+    def __rshift__(self, next_node: "Tr[O, O]") -> "Tr[I, O]":
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncTransformer[O, O]) -> AsyncTransformer[I, O]:
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["Tr[O, O1]", "Tr[O, O2]", "Tr[O, O3]"],
-    ) -> "Transformer[I, tuple[O1, O2, O3]]":
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["Tr[O, O1]", "Tr[O, O2]", "Tr[O, O3]", "Tr[O, O4]"],
-    ) -> "Tr[I, tuple[O1, O2, O3, O4]]":
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["Tr[O, O1]", "Tr[O, O2]", "Tr[O, O3]", "Tr[O, O4]", "Tr[O, O5]"],
-    ) -> "Tr[I, tuple[O1, O2, O3, O4, O5]]":
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "Tr[O, O1]", "Tr[O, O2]", "Tr[O, O3]", "Tr[O, O4]", "Tr[O, O5]", "Tr[O, O6]"
-        ],
-    ) -> "Tr[I, tuple[O1, O2, O3, O4, O5, O6]]":
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "Tr[O, O1]",
-            "Tr[O, O2]",
-            "Tr[O, O3]",
-            "Tr[O, O4]",
-            "Tr[O, O5]",
-            "Tr[O, O6]",
-            "Tr[O, O7]",
-        ],
-    ) -> "Tr[I, tuple[O1, O2, O3, O4, O5, O6, O7]]":
-        pass
-
-    @overload
-    def __rshift__(self, next_node: "Tr[O, O1]") -> "Tr[I, O1]":
-        pass
-
-    @overload
-    def __rshift__(self, next_node: AsyncTransformer[O, O1]) -> AsyncTransformer[I, O1]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["AT[O, O1]", "BT[O, O2]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "AT[O, O2]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["AT[O, O1]", "BT[O, O2]", "BT[O, O3]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "AT[O, O2]", "BT[O, O3]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "AT[O, O3]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["AT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "AT[O, O2]", "BT[O, O3]", "BT[O, O4]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "AT[O, O3]", "BT[O, O4]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "AT[O, O4]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["AT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "AT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "AT[O, O3]", "BT[O, O4]", "BT[O, O5]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "AT[O, O4]", "BT[O, O5]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple["BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "AT[O, O5]"],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "AT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "AT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "AT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "AT[O, O4]", "BT[O, O5]", "BT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "AT[O, O5]", "BT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "AT[O, O6]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "AT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "AT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "AT[O, O3]", "BT[O, O4]", "BT[O, O5]", "BT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "AT[O, O4]", "BT[O, O5]", "BT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "AT[O, O5]", "BT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
 
     @overload
     def __rshift__(
         self,
-        next_node: tuple[
-            "BT[O, O1]", "BT[O, O2]", "BT[O, O3]", "BT[O, O4]", "BT[O, O5]", "AT[O, O6]", "BT[O, O7]"
-        ],
-    ) -> AsyncTransformer[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
         pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node: tuple["Tr[O, O]", "Tr[O, O]"],
+    ) -> "Tr[I, tuple[O, O]]":
+        pass
+
+    @overload
+    def __rshift__(
+        self,
+        next_node

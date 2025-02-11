@@ -45,7 +45,17 @@ class TestBasicTransformerTypes(MypyTestSuite):
         graph3 = square >> square_root >> (to_string, square, to_string)
         assert_type(graph3, Transformer[float, tuple[str, float, str]])
 
-        # ... rest of the code ...
+        graph4 = square >> square_root >> (to_string, square, to_string, square)
+        assert_type(graph4, Transformer[float, tuple[str, float, str, float]])
+
+        graph5 = square >> square_root >> (to_string, square, to_string, square, to_string)
+        assert_type(graph5, Transformer[float, tuple[str, float, str, float, str]])
+
+        graph6 = square >> square_root >> (to_string, square, to_string, square, to_string, square)
+        assert_type(graph6, Transformer[float, tuple[str, float, str, float, str, float]])
+
+        graph7 = square >> square_root >> (to_string, square, to_string, square, to_string, square, to_string)
+        assert_type(graph7, Transformer[float, tuple[str, float, str, float, str, float, str]])
 
     def test_bridge(self):
         """
@@ -65,9 +75,13 @@ class TestBasicTransformerTypes(MypyTestSuite):
 
         async_pipeline = _square >> to_string
         async_pipeline2 = forward[int]() >> _square >> to_string
-        # ... rest of the code ...
+        async_pipeline3 = forward[int]() >> (_square, _square >> to_string)
+        async_pipeline4 = _square >> (to_string, forward[float]())
+        async_pipeline5 = _square >> (to_string, forward[float]()) >> tuple_concatenate
 
         assert_type(_square, AsyncTransformer[int, float])
         assert_type(async_pipeline, AsyncTransformer[int, str])
         assert_type(async_pipeline2, AsyncTransformer[int, str])
-        # ... rest of the code ...
+        assert_type(async_pipeline3, AsyncTransformer[int, tuple[float, str]])
+        assert_type(async_pipeline4, AsyncTransformer[int, tuple[str, float]])
+        assert_type(async_pipeline5, AsyncTransformer[int, str])

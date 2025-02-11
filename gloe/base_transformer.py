@@ -26,7 +26,6 @@ _Out5 = TypeVar("_Out5")
 _Out6 = TypeVar("_Out6")
 _Out7 = TypeVar("_Out7")
 
-
 PreviousTransformer: TypeAlias = Union[
     None,
     _Self,
@@ -37,7 +36,6 @@ PreviousTransformer: TypeAlias = Union[
     tuple[_Self, _Self, _Self, _Self, _Self, _Self],
     tuple[_Self, _Self, _Self, _Self, _Self, _Self, _Self],
 ]
-
 
 class TransformerException(Exception):
     def __init__(
@@ -55,7 +53,6 @@ class TransformerException(Exception):
     @property
     def internal_exception(self):
         return self._internal_exception.with_traceback(self._traceback)
-
 
 class BaseTransformer(Generic[_In, _Out, _Self]):
     def __init__(self):

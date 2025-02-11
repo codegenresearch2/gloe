@@ -11,15 +11,26 @@ from typing import (
     Awaitable,
 )
 
+def _format_tuple_annotation(tuple_annotation, generic_input_param, input_annotation) -> str:
+    return f"({', '.join(_format_annotation(a, generic_input_param, input_annotation) for a in tuple_annotation)})"
+
+def _format_union_annotation(union_annotation, generic_input_param, input_annotation) -> str:
+    return f"({' | '.join(_format_annotation(a, generic_input_param, input_annotation) for a in union_annotation.__args__)})"
+
+def _format_generic_alias_annotation(generic_alias, generic_input_param, input_annotation) -> str:
+    return f"{generic_alias.__origin__.__name__}[{', '.join(_format_annotation(a, generic_input_param, input_annotation) for a in generic_alias.__args__)}]"
+
 def _format_annotation(annotation, generic_input_param, input_annotation) -> str:
     if type(annotation) == str:
         return annotation
     if type(annotation) == tuple:
-        return f"({', '.join(_format_annotation(a, generic_input_param, input_annotation) for a in annotation)})"
-    if get_origin(annotation) in {tuple, Union}:
-        return f"({' | '.join(_format_annotation(a, generic_input_param, input_annotation) for a in annotation.__args__)})"
+        return _format_tuple_annotation(annotation, generic_input_param, input_annotation)
+    if get_origin(annotation) == tuple:
+        return _format_tuple_annotation(annotation.__args__, generic_input_param, input_annotation)
+    if get_origin(annotation) == Union:
+        return _format_union_annotation(annotation, generic_input_param, input_annotation)
     if type(annotation) in {GenericAlias, _GenericAlias}:
-        return f"{annotation.__origin__.__name__}[{', '.join(_format_annotation(a, generic_input_param, input_annotation) for a in annotation.__args__)}]"
+        return _format_generic_alias_annotation(annotation, generic_input_param, input_annotation)
     if annotation == generic_input_param:
         return str(input_annotation.__name__)
     return str(annotation.__name__)
@@ -62,5 +73,3 @@ def awaitify(sync_func: Callable[_Args, _R]) -> Callable[_Args, Awaitable[_R]]:
     async def async_func(*args, **kwargs):
         return sync_func(*args, **kwargs)
     return async_func
-
-# Additional test cases and docstring for function documentation can be added here

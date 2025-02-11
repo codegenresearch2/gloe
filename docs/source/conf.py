@@ -24,12 +24,10 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",  # Included in gold code, but commented out
+    # "sphinx_autodoc_typehints",  # Commented out in gold code
     "myst_parser",
     "sphinx_copybutton",
 ]
-
-# Configuration options
 overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
@@ -38,14 +36,15 @@ intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
-# HTML output options
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-templates_path = ["_static"]  # Included in gold code
-exclude_patterns = ["Thumbs.db", ".DS_Store"]  # Included in gold code
-autodoc_typehints = "description"  # Included in gold code
+templates_path = ["_templates"]  # Updated to match gold code
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
 autodoc_type_aliases = {
     "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
 }
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_title = "Gloe"
 html_theme = "furo"
 html_last_updated_fmt = ""
@@ -61,6 +60,13 @@ html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
+    "light_css_variables": {  # Added to match gold code
+        "color-brand-primary": "#00e6bf",
+        "color-brand-content": "#00e6bf",
+        "font-stack": "Roboto, sans-serif",
+        "font-stack--monospace": "Courier, monospace",
+        "font-size--normal": "Courier, monospace",
+    },
     "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
@@ -82,6 +88,6 @@ html_theme_options = {
     ],
 }
 
-# Pygments style options
+# pygments_style = "styles.GloeStyle"  # Commented out in gold code
 pygments_dark_style = "styles.GloeDarkStyle"
 pygments_light_style = "styles.GloeLightStyle"

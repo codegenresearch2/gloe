@@ -97,8 +97,8 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
     else:
         class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
             async def transform_async(self, data: _In) -> tuple[Any, ...]:
-                intermediate_result = await incident_transformer.transform_async(data) if asyncio.iscoroutinefunction(incident_transformer.transform_async) else incident_transformer.transform(data)
-                return tuple(await receiving_transformer.transform_async(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.transform_async) else receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers)
+                intermediate_result = await incident_transformer.transform_async(data) if hasattr(incident_transformer, 'transform_async') and callable(getattr(incident_transformer, 'transform_async')) else incident_transformer.transform(data)
+                return tuple(await receiving_transformer.transform_async(intermediate_result) if hasattr(receiving_transformer, 'transform_async') and callable(getattr(receiving_transformer, 'transform_async')) else receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers)
 
     new_transformer = NewTransformer()
     new_transformer._previous = cast(Transformer, receiving_transformers)

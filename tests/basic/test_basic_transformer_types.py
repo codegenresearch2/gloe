@@ -4,7 +4,14 @@ from typing_extensions import assert_type
 from gloe import Transformer, async_transformer, AsyncTransformer
 from gloe.experimental import bridge
 from gloe.utils import forward
-from tests.lib.transformers import square, square_root, plus1, minus1, to_string, tuple_concatenate
+from tests.lib.transformers import (
+    square,
+    square_root,
+    plus1,
+    minus1,
+    to_string,
+    tuple_concatenate,
+)
 from tests.type_utils.mypy_test_suite import MypyTestSuite
 
 In = TypeVar("In")

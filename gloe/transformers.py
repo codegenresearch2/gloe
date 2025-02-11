@@ -33,7 +33,39 @@ AsyncNext3 = Union[
     tuple[BT[O, O1], BT[O, O2], AT[O, O3]],
 ]
 
-# ... (other AsyncNext types)
+AsyncNext4 = Union[
+    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4]],
+    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4]],
+    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4]],
+]
+
+AsyncNext5 = Union[
+    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5]],
+    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5]],
+    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5]],
+]
+
+AsyncNext6 = Union[
+    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
+    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
+    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5], BT[O, O6]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5], BT[O, O6]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], AT[O, O6]],
+]
+
+AsyncNext7 = Union[
+    tuple[AT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], AT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], BT[O, O2], AT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], AT[O, O4], BT[O, O5], BT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], AT[O, O5], BT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], AT[O, O6], BT[O, O7]],
+    tuple[BT[O, O1], BT[O, O2], BT[O, O3], BT[O, O4], BT[O, O5], BT[O, O6], AT[O, O7]],
+]
 
 class Transformer(BaseTransformer[I, O, Tr], ABC):
     """
@@ -93,7 +125,7 @@ class Transformer(BaseTransformer[I, O, Tr], ABC):
                 ).internal_exception
 
         if transformed is None:
-            raise NotImplementedError("Transformer did not return a result")
+            return None
 
         return cast(O, transformed)
 
@@ -109,7 +141,25 @@ class Transformer(BaseTransformer[I, O, Tr], ABC):
     def __rshift__(self, next_node: AsyncNext2[O, O1, O2]) -> AT[I, tuple[O1, O2]]:
         pass
 
-    # ... (other overloads)
+    @overload
+    def __rshift__(self, next_node: AsyncNext3[O, O1, O2, O3]) -> AT[I, tuple[O1, O2, O3]]:
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncNext4[O, O1, O2, O3, O4]) -> AT[I, tuple[O1, O2, O3, O4]]:
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncNext5[O, O1, O2, O3, O4, O5]) -> AT[I, tuple[O1, O2, O3, O4, O5]]:
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncNext6[O, O1, O2, O3, O4, O5, O6]) -> AT[I, tuple[O1, O2, O3, O4, O5, O6]]:
+        pass
+
+    @overload
+    def __rshift__(self, next_node: AsyncNext7[O, O1, O2, O3, O4, O5, O6, O7]) -> AT[I, tuple[O1, O2, O3, O4, O5, O6, O7]]:
+        pass
 
     def __rshift__(self, next_node):
         from gloe._composition_utils import _compose_nodes

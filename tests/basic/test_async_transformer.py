@@ -61,26 +61,31 @@ class RequestData(AsyncTransformer[str, dict[str, str]]):
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
+        '''Test the basic case of an async transformer'''
         test_forward = request_data >> forward()
         result = await test_forward(_URL)
         self.assertDictEqual(_DATA, result)
 
     async def test_begin_with_transformer(self):
+        '''Test beginning a pipeline with a transformer'''
         test_forward = forward[str]() >> request_data
         result = await test_forward(_URL)
         self.assertDictEqual(_DATA, result)
 
     async def test_async_on_divergent_connection(self):
+        '''Test an async transformer on a divergent connection'''
         test_forward = forward[str]() >> (forward[str](), request_data)
         result = await test_forward(_URL)
         self.assertEqual((_URL, _DATA), result)
 
     async def test_divergent_connection_from_async(self):
+        '''Test a divergent connection from an async transformer'''
         test_forward = request_data >> (forward[dict[str, str]](), forward[dict[str, str]]())
         result = await test_forward(_URL)
         self.assertEqual((_DATA, _DATA), result)
 
     async def test_async_transformer_wrong_arg(self):
+        '''Test an async transformer with an unsupported argument'''
         def next_transformer():
             pass
 
@@ -94,6 +99,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             ensured_delayed_request(0.01) >> next_transformer  # type: ignore
 
     async def test_async_transformer_copy(self):
+        '''Test copying an async transformer'''
         @transformer
         def add_slash(path: str) -> str:
             return path + "/"
@@ -109,6 +115,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(_DATA, result)
 
     def test_async_transformer_wrong_signature(self):
+        '''Test an async transformer with an incorrect signature'''
         with self.assertWarns(RuntimeWarning):
             @async_transformer  # type: ignore
             async def many_args(arg1: str, arg2: int):
@@ -116,10 +123,12 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
                 return arg1, arg2
 
     def test_async_transformer_signature_representation(self):
+        '''Test the representation of an async transformer's signature'''
         signature = request_data.signature()
         self.assertEqual(str(signature), "(url: str) -> dict[str, str]")
 
     def test_async_transformer_representation(self):
+        '''Test the representation of an async transformer'''
         self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")
         class_request_data = RequestData()
         self.assertEqual(repr(class_request_data), "str -> (RequestData) -> dict[str, str]")
@@ -132,6 +141,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(repr(request_and_serialize), "dict -> (2 transformers omitted) -> str")
 
     async def test_exhausting_large_flow(self):
+        '''Test the instantiation of a large graph'''
         graph = async_plus1
         max_iters = 1500
         for i in range(max_iters):
@@ -140,6 +150,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, max_iters + 1)
 
     async def test_async_transformer_error_handling(self):
+        '''Test if a raised error stores the correct TransformerException as its cause'''
         async_graph = async_plus1 >> async_natural_logarithm
         try:
             await async_graph(-2)
@@ -148,11 +159,13 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             self.assertIsInstance(exception.__cause__, TransformerException)
 
     async def test_execute_async_wrong_flow(self):
+        '''Test executing an async flow with an incorrect argument'''
         flow = [2]
         with self.assertRaises(NotImplementedError):
             await _execute_async_flow(flow, 1)  # type: ignore
 
     async def test_composition_transform_method(self):
+        '''Test the transform_async method of a composed transformer'''
         test3 = forward[float]() >> async_plus1
         result = await test3.transform_async(5)
         self.assertIsNone(result)

@@ -109,7 +109,6 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
-                # TODO: Make this filter condition stronger
                 transformer_frames = [
                     frame
                     for frame in tb
@@ -119,9 +118,9 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
                 if len(transformer_frames) == 1:
                     transformer_frame = transformer_frames[0]
                     exception_message = (
-                        f'\n  File "{transformer_frame.filename}", line {transformer_frame.lineno}, '
-                        f'in transformer "{self.__class__.__name__}"\n  '
-                        f"  >> {transformer_frame.line}"
+                        f'File "{transformer_frame.filename}", line {transformer_frame.lineno}, '
+                        f'in transformer "{self.__class__.__name__}"\n'
+                        f'  >> {transformer_frame.line}'
                     )
                 else:
                     exception_message = (
@@ -137,7 +136,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if type(transformed) is not None:
+        if transformed is not None:
             return cast(O, transformed)
 
         raise NotImplementedError

@@ -1,7 +1,6 @@
 import traceback
 from abc import ABC, abstractmethod
 from inspect import Signature
-
 from typing import (
     TypeVar,
     overload,
@@ -10,7 +9,6 @@ from typing import (
     TypeAlias,
     Union,
 )
-
 from gloe.base_transformer import BaseTransformer, TransformerException
 from gloe.async_transformer import AsyncTransformer
 
@@ -148,10 +146,10 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if type(transformed) is not None:
+        if transformed is not None:
             return cast(O, transformed)
 
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError("Transformation result is not implemented.")
 
     @overload
     def __rshift__(

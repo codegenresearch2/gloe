@@ -4,22 +4,7 @@ import uuid
 import inspect
 from functools import cached_property
 from inspect import Signature
-
-import networkx as nx
-from networkx import DiGraph, Graph
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    TypeVar,
-    Union,
-    cast,
-    Iterable,
-    get_args,
-    get_origin,
-    TypeAlias,
-    Type,
-)
+from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
 
@@ -83,15 +68,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def label(self) -> str:
-        """
-        Label used in visualization.
-
-        When the transformer is created by the `@transformer` decorator, it is the
-        name of the function.
-
-        When creating a transformer by extending the `Transformer` class, it is the name of
-        the class.
-        """
         return self._label
 
     @property
@@ -104,10 +80,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def previous(self) -> PreviousTransformer["BaseTransformer"]:
-        """
-        Previous transformers. It can be None, a single transformer, or a tuple of many
-        transformers.
-        """
         return self._previous
 
     @property
@@ -137,7 +109,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             copied.instance_id = uuid.uuid4()
 
         if self.previous is not None:
-            # copy_next_previous = 'none' if copy_previous == 'first_previous' else copy_previous
             if type(self.previous) == tuple:
                 new_previous: list[BaseTransformer] = [
                     previous_transformer.copy() for previous_transformer in self.previous
@@ -180,7 +151,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
     def signature(self) -> Signature:
         return self._signature(type(self))
 
-    def _signature(self, klass: Type) -> Signature:
+    def _signature(self, klass: type) -> Signature:
         orig_bases = getattr(self, "__orig_bases__", [])
         transformer_args = [
             get_args(base) for base in orig_bases if get_origin(base) == klass
@@ -261,7 +232,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         parent_id: str,
         next_node: "BaseTransformer",
     ):
-        child._dag(child_net, next_node, custom_data={"parent_id": parent_id})
+        child._dag(child_net, next_node, {"parent_id": parent_id, "bounding_box": True, "box_label": "mapping"})
 
     @property
     def node_id(self) -> str:
@@ -295,40 +266,23 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             net.add_nodes_from(child_net.nodes.data())
             net.add_edges_from(child_net.edges.data())
 
-            child_root_node = [n for n in child_net.nodes if child_net.in_degree(n) == 0][
-                0
-            ]
-            child_final_node = [
-                n for n in child_net.nodes if child_net.out_degree(n) == 0
-            ][0]
+            child_root_node = [n for n in child_net.nodes if child_net.in_degree(n) == 0][0]
+            child_final_node = [n for n in child_net.nodes if child_net.out_degree(n) == 0][0]
 
             if self.invisible:
                 if type(visible_previous) == tuple:
                     for prev in visible_previous:
-                        net.add_edge(
-                            prev.node_id, child_root_node, label=prev.output_annotation
-                        )
+                        net.add_edge(prev.node_id, child_root_node, label=prev.output_annotation)
                 elif isinstance(visible_previous, BaseTransformer):
-                    net.add_edge(
-                        visible_previous.node_id,
-                        child_root_node,
-                        label=visible_previous.output_annotation,
-                    )
+                    net.add_edge(visible_previous.node_id, child_root_node, label=visible_previous.output_annotation)
             else:
                 node_id = self._add_net_node(net)
                 net.add_edge(node_id, child_root_node)
 
             if child_final_node != next_node_id:
-                net.add_edge(
-                    child_final_node, next_node_id, label=next_node.input_annotation
-                )
+                net.add_edge(child_final_node, next_node_id, label=next_node.input_annotation)
 
-    def _dag(
-        self,
-        net: DiGraph,
-        next_node: Union["BaseTransformer", None] = None,
-        custom_data: dict[str, Any] = {},
-    ):
+    def _dag(self, net: DiGraph, next_node: Union["BaseTransformer", None] = None, custom_data: dict[str, Any] = {}):
         in_nodes = [edge[1] for edge in net.in_edges()]
 
         previous = self.previous
@@ -344,11 +298,8 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
                 for prev in previous:
                     previous_node_id = prev.node_id
 
-                    # TODO: check the impact of the below line to the Mapper transformer
                     if not prev.invisible and len(prev.children) == 0:
-                        net.add_edge(
-                            previous_node_id, next_node_id, label=prev.output_annotation
-                        )
+                        net.add_edge(previous_node_id, next_node_id, label=prev.output_annotation)
 
                     if previous_node_id not in in_nodes:
                         prev._dag(net, _next_node, custom_data)
@@ -362,13 +313,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
                 previous_node_id = previous.node_id
 
-                if len(previous.children) == 0 and (
-                    not previous.invisible or previous.previous is None
-                ):
+                if len(previous.children) == 0 and (not previous.invisible or previous.previous is None):
                     previous_node_id = previous._add_net_node(net)
-                    net.add_edge(
-                        previous_node_id, next_node_id, label=previous.output_annotation
-                    )
+                    net.add_edge(previous_node_id, next_node_id, label=previous.output_annotation)
 
                 if previous_node_id not in in_nodes:
                     previous._dag(net, _next_node, custom_data)
@@ -384,7 +331,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         self._dag(net)
         return net
 
-    def export(self, path: str, with_edge_labels: bool = True):  # pragma: no cover
+    def export(self, path: str, with_edge_labels: bool = True):
         net = self.graph()
         boxed_nodes = [
             node

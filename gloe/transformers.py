@@ -68,34 +68,12 @@ AsyncNext7 = Union[
 ]
 
 class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
-    """
-    A Transformer is the generic block with the responsibility to take an input of type
-    `T` and transform it to an output of type `S`.
-
-    See Also:
-        Read more about this feature in the page :ref:`creating-a-transformer`.
-
-    Example:
-        Typical usage example::
-
-            class Stringifier(Transformer[dict, str]):
-                ...
-
-    """
-
     def __init__(self):
         super().__init__()
         self.__class__.__annotations__ = self.transform.__annotations__
 
     @abstractmethod
     def transform(self, data: I) -> O:
-        """Main method to be implemented and responsible to perform the transformer logic"""
-        if not self.validate_input(data):
-            raise ValueError("Invalid input data")
-
-    def validate_input(self, data: I) -> bool:
-        # Add your input validation logic here
-        # Return True if the data is valid, False otherwise
         pass
 
     def signature(self) -> Signature:
@@ -118,7 +96,6 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
-                # TODO: Make this filter condition stronger
                 transformer_frames = [
                     frame
                     for frame in tb
@@ -147,7 +124,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if transformed is not None:
+        if type(transformed) is not None:
             return cast(O, transformed)
 
         raise NotImplementedError
@@ -255,16 +232,5 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         pass
 
     def __rshift__(self, next_node):
-        if not self.validate_next_node(next_node):
-            raise ValueError("Invalid next node")
-
-        # Add your additional key checks logic here
-
-        # Call the _compose_nodes function from gloe/_composition_utils.py
         from gloe._composition_utils import _compose_nodes
         return _compose_nodes(self, next_node)
-
-    def validate_next_node(self, next_node) -> bool:
-        # Add your next node validation logic here
-        # Return True if the next node is valid, False otherwise
-        pass

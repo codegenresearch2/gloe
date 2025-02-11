@@ -12,9 +12,9 @@ from pygments.token import (
     Whitespace,
 )
 
-# Switching to a different pygments style
-class GloeStyle(Style):
-    name = "custom"
+# Class name reflects the style it represents
+class GloeLightStyle(Style):
+    name = "light"
 
     background_color = "#f5f5f5"
     highlight_color = "#e0e0e0"
@@ -83,5 +83,5 @@ html_theme_options = {
     },
 }
 
-# Switching to a different pygments style
-pygments_style = "styles.GloeStyle"
+# Pygments style reference matches the naming convention used in the gold code
+pygments_light_style = "styles.GloeLightStyle"

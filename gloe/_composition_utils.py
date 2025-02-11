@@ -15,7 +15,7 @@ _Out = TypeVar("_Out")
 _NextOut = TypeVar("_NextOut")
 
 def is_transformer(node):
-    if type(node) == list or type(node) == tuple:
+    if isinstance(node, list) or isinstance(node, tuple):
         return all(isinstance(n, Transformer) for n in node)
     return isinstance(node, Transformer)
 
@@ -40,11 +40,11 @@ def _resolve_serial_connection_signatures(transformer2: BaseTransformer, generic
     new_signature = signature2.replace(parameters=[new_parameter], return_annotation=_specify_types(signature2.return_annotation, generic_vars))
     return new_signature
 
-def _merge_serial(transformer1, _transformer2):
+def _merge_serial(transformer1, transformer2):
     if transformer1.previous is None:
         transformer1 = transformer1.copy(regenerate_instance_id=True)
 
-    transformer2 = _transformer2.copy(regenerate_instance_id=True)
+    transformer2 = transformer2.copy(regenerate_instance_id=True)
     transformer2._set_previous(transformer1)
 
     signature1: Signature = transformer1.signature()
@@ -67,34 +67,34 @@ def _merge_serial(transformer1, _transformer2):
             return len(transformer1) + len(transformer2)
 
     new_transformer: BaseTransformer | None = None
-    if is_transformer(transformer1) and is_transformer(_transformer2):
+    if is_transformer(transformer1) and is_transformer(transformer2):
         class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
-                return _transformer2(transformer1(data))
+                return transformer2.transform(transformer1.transform(data))
         new_transformer = NewTransformer1()
 
-    elif is_async_transformer(transformer1) and is_transformer(_transformer2):
+    elif is_async_transformer(transformer1) and is_transformer(transformer2):
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return _transformer2(await transformer1(data))
+                return transformer2.transform(await transformer1.transform_async(data))
         new_transformer = NewTransformer2()
 
-    elif is_async_transformer(transformer1) and is_async_transformer(_transformer2):
+    elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer3(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return await _transformer2(await transformer1(data))
+                return await transformer2.transform_async(await transformer1.transform_async(data))
         new_transformer = NewTransformer3()
 
-    elif is_transformer(transformer1) and is_async_transformer(_transformer2):
+    elif is_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer4(AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return await _transformer2(transformer1(data))
+                return await transformer2.transform_async(transformer1.transform(data))
         new_transformer = NewTransformer4()
 
     else:
-        raise UnsupportedTransformerArgException(_transformer2)
+        raise UnsupportedTransformerArgException(transformer2)
 
-    return _resolve_new_merge_transformers(new_transformer, _transformer2)
+    return _resolve_new_merge_transformers(new_transformer, transformer2)
 
 def _merge_diverging(incident_transformer, *receiving_transformers):
     if incident_transformer.previous is None:
@@ -133,17 +133,17 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
         class NewTransformer1(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
             def transform(self, data: _In) -> tuple[Any, ...]:
-                intermediate_result = incident_transformer(data)
-                return tuple(receiving_transformer(intermediate_result) for receiving_transformer in receiving_transformers)
+                intermediate_result = incident_transformer.transform(data)
+                return tuple(receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers)
         new_transformer = NewTransformer1()
 
     else:
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
             async def transform_async(self, data: _In) -> tuple[Any, ...]:
-                intermediate_result = await incident_transformer(data) if asyncio.iscoroutinefunction(incident_transformer.__call__) else incident_transformer(data)
+                intermediate_result = await incident_transformer(data) if asyncio.iscoroutinefunction(incident_transformer.__call__) else incident_transformer.transform(data)
                 outputs = []
                 for receiving_transformer in receiving_transformers:
-                    output = await receiving_transformer(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.__call__) else receiving_transformer(intermediate_result)
+                    output = await receiving_transformer(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.__call__) else receiving_transformer.transform(intermediate_result)
                     outputs.append(output)
                 return tuple(outputs)
         new_transformer = NewTransformer2()
@@ -165,7 +165,3 @@ def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer)
             raise UnsupportedTransformerArgException(next_node)
     else:
         raise UnsupportedTransformerArgException(next_node)
-
-I have addressed the feedback provided by the oracle. The test case feedback indicated that there was a `SyntaxError` caused by an unterminated string literal in the code. However, I have reviewed the code and I don't see any unterminated string literals. It is possible that the error message is referring to a different part of the code that is not included in the provided snippet.
-
-Since the oracle did not provide any feedback on the code itself, I assume that the code is correct and no changes are needed.

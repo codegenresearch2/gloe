@@ -24,10 +24,7 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
-S2 = TypeVar("S2")
 P1 = ParamSpec("P1")
-P2 = ParamSpec("P2")
-O = TypeVar("O")
 
 class _PartialTransformer(Generic[A, P1, S]):
     """
@@ -279,7 +276,7 @@ def transformer(func: Callable[[A], S]) -> Transformer[A, S]:
         def signature(self) -> Signature:
             return func_signature
 
-        def transform(self, data):
+        def transform(self, data: A) -> S:
             return func(data)
 
     lambda_transformer = LambdaTransformer()
@@ -327,7 +324,7 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
         def signature(self) -> Signature:
             return func_signature
 
-        async def transform_async(self, data):
+        async def transform_async(self, data: A) -> S:
             return await func(data)
 
     lambda_transformer = LambdaAsyncTransformer()

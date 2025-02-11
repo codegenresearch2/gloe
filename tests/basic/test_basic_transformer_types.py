@@ -10,21 +10,15 @@ from tests.type_utils.mypy_test_suite import MypyTestSuite
 In = TypeVar("In")
 Out = TypeVar("Out")
 
-num_bridge = bridge[float]("num")
-
 class TestBasicTransformerTypes(MypyTestSuite):
 
     def test_transformer_simple_typing(self):
-        """
-        Test the most simple transformer typing
-        """
+        """Test the most simple transformer typing"""
         graph = square
         assert_type(graph, Transformer[float, float])
 
     def test_simple_flow_typing(self):
-        """
-        Test the most simple transformer flow typing
-        """
+        """Test the most simple transformer flow typing"""
         graph = (
             square
             >> square_root
@@ -32,9 +26,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph, Transformer[float, float])
 
     def test_flow_with_mixed_types(self):
-        """
-        Test the transformer flow typing with mixed types
-        """
+        """Test the transformer flow typing with mixed types"""
         graph = (
             square
             >> square_root
@@ -43,9 +35,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph, Transformer[float, str])
 
     def test_divergent_flow_types(self):
-        """
-        Test the transformer flow typing with divergent types
-        """
+        """Test the transformer flow typing with divergent types"""
         graph2 = (
             square
             >> square_root
@@ -89,9 +79,8 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph7, Transformer[float, tuple[str, float, str, float, str, float, str]])
 
     def test_bridge(self):
-        """
-        Test the transformer flow typing with bridge
-        """
+        """Test the transformer flow typing with bridge"""
+        num_bridge = bridge[float]("num")
         graph = (
             plus1
             >> num_bridge.pick()
@@ -101,9 +90,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph, Transformer[float, tuple[float, float]])
 
     def test_async_transformer(self):
-        """
-        Test the async transformer typing
-        """
+        """Test the async transformer typing"""
         @async_transformer
         async def _square(num: int) -> float:
             return float(num * num)

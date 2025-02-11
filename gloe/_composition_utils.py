@@ -54,19 +54,19 @@ def _merge_serial(transformer1, _transformer2):
     if is_transformer(transformer1) and is_transformer(_transformer2):
         class NewTransformer(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
-                return transformer2(transformer1(data))
+                return transformer2.transform(transformer1.transform(data))
     elif is_async_transformer(transformer1) and is_transformer(_transformer2):
         class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return transformer2(await transformer1(data))
+                return transformer2.transform(await transformer1.transform_async(data))
     elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return await transformer2(await transformer1(data))
+                return await transformer2.transform_async(await transformer1.transform_async(data))
     elif is_transformer(transformer1) and is_async_transformer(_transformer2):
         class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                return await transformer2(transformer1(data))
+                return await transformer2.transform_async(transformer1.transform(data))
     else:
         raise UnsupportedTransformerArgException(transformer2)
 
@@ -92,13 +92,13 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
         class NewTransformer(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
             def transform(self, data: _In) -> tuple[Any, ...]:
-                intermediate_result = incident_transformer(data)
-                return tuple(receiving_transformer(intermediate_result) for receiving_transformer in receiving_transformers)
+                intermediate_result = incident_transformer.transform(data)
+                return tuple(receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers)
     else:
         class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
             async def transform_async(self, data: _In) -> tuple[Any, ...]:
-                intermediate_result = await incident_transformer(data) if asyncio.iscoroutinefunction(incident_transformer.__call__) else incident_transformer(data)
-                return tuple(await receiving_transformer(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.__call__) else receiving_transformer(intermediate_result) for receiving_transformer in receiving_transformers)
+                intermediate_result = await incident_transformer.transform_async(data) if asyncio.iscoroutinefunction(incident_transformer.transform_async) else incident_transformer.transform(data)
+                return tuple(await receiving_transformer.transform_async(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.transform_async) else receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers)
 
     new_transformer = NewTransformer()
     new_transformer._previous = cast(Transformer, receiving_transformers)

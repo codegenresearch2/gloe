@@ -9,12 +9,9 @@ _In = TypeVar("_In")
 _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
-class InvalidInputType(Exception):
-    pass
-
-def validate_string(value: Any) -> None:
+def is_string(value: Any) -> None:
     if not isinstance(value, str):
-        raise InvalidInputType(f"Expected string, got {type(value).__name__}")
+        raise Exception(f"Expected string, got {type(value).__name__}")
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
@@ -24,8 +21,8 @@ async def request_data(url: str) -> dict[str, str]:
 class HasNotBarKey(Exception):
     pass
 
-def has_bar_key(dict: dict[str, str]) -> None:
-    if "bar" not in dict.keys():
+def check_bar_key(data: dict[str, str]) -> None:
+    if "bar" not in data.keys():
         raise HasNotBarKey()
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
@@ -59,7 +56,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(incoming=[validate_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_string], outcome=[check_bar_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -69,7 +66,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(incoming=[validate_string], outcome=[has_bar_key])
+        @ensure(incoming=[is_string], outcome=[check_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)

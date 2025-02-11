@@ -270,12 +270,12 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         input_type = self.input_type
         return input_type.__name__ if input_type else "Unknown"
 
-    def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}):
+    def _add_net_node(self, net: DiGraph, custom_data: dict[str, Any] = {}):
         """
         Adds a node to the networkx graph.
 
         Args:
-            net (Graph): The networkx graph.
+            net (DiGraph): The networkx graph.
             custom_data (dict[str, Any]): Additional data to be added as node attributes.
 
         Returns:
@@ -286,7 +286,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         if node_id not in net.nodes:
             net.add_node(node_id, **props)
         else:
-            nx.set_node_attributes(net, {node_id: props})
+            net.nodes[node_id].update(props)
         return node_id
 
     def _add_child_node(

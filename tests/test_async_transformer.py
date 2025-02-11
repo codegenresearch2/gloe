@@ -10,7 +10,7 @@ _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
 def is_string(value: Any) -> None:
-    if not isinstance(value, str):
+    if type(value) is not str:
         raise Exception(f"Expected string, got {type(value).__name__}")
 
 @async_transformer
@@ -21,8 +21,8 @@ async def request_data(url: str) -> dict[str, str]:
 class HasNotBarKey(Exception):
     pass
 
-def check_bar_key(data: dict[str, str]) -> None:
-    if "bar" not in data.keys():
+def has_bar_key(dict: dict[str, str]) -> None:
+    if "bar" not in dict.keys():
         raise HasNotBarKey()
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
@@ -56,7 +56,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, _DATA)
 
     async def test_ensure_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[check_bar_key])
+        @ensure(incoming=[is_string], outcome=[has_bar_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
@@ -66,7 +66,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
-        @ensure(incoming=[is_string], outcome=[check_bar_key])
+        @ensure(incoming=[is_string], outcome=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -86,17 +86,17 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(copied_transformer, request_data)
 
     async def test_unsupported_argument(self):
-        def unsupported_function():
+        def next_transformer():
             return None
 
         with self.assertRaises(
             UnsupportedTransformerArgException,
-            msg=f"Unsupported transformer argument: {unsupported_function}",
+            msg=f"Unsupported transformer argument: {next_transformer}",
         ):
-            _ = request_data >> unsupported_function  # type: ignore
+            _ = request_data >> next_transformer  # type: ignore
 
         with self.assertRaises(
             UnsupportedTransformerArgException,
-            msg=f"Unsupported transformer argument: {unsupported_function}",
+            msg=f"Unsupported transformer argument: {next_transformer}",
         ):
-            _ = request_data >> (unsupported_function, forward[str]())  # type: ignore
+            _ = request_data >> (next_transformer, forward[str]())  # type: ignore

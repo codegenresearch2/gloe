@@ -12,8 +12,6 @@ _Out = TypeVar("_Out")
 @transformer
 def forget(data: Any) -> None:
     """Transform any input data to `None`"""
-    if not isinstance(data, (int, float, str, list, tuple, dict, set, bool)):
-        raise TypeError("Input must be a basic data type or collection.")
     return None
 
 
@@ -43,6 +41,4 @@ def forward_incoming(
     inner_transformer: Transformer[_In, _Out]
 ) -> Transformer[_In, Tuple[_Out, _In]]:
     """Combines the inner transformer with the forward transformer to return a tuple of the transformed data and the original input."""
-    if not isinstance(inner_transformer, Transformer):
-        raise TypeError("inner_transformer must be an instance of Transformer.")
     return forward[_In]() >> (inner_transformer, forward())

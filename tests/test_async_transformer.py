@@ -27,10 +27,6 @@ class HasFooKey(Exception):
     pass
 
 
-class IsNotInt(Exception):
-    pass
-
-
 def has_foo_key(dict: dict[str, str]) -> bool:
     return "foo" in dict
 
@@ -94,7 +90,8 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         @ensure(incoming=[is_int], outcome=[has_foo_key])
         @async_transformer
         async def ensured_request(url: str) -> dict[str, str]:
-            await asyncio.sleep(0.1)
+            if not has_foo_key(_DATA):
+                raise HasNotFooKey("The 'foo' key is missing from the data.")
             return _DATA
 
         pipeline = ensured_request >> forward()
@@ -106,6 +103,8 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         @ensure(incoming=[is_int], outcome=[has_foo_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
+            if not has_foo_key(_DATA):
+                raise HasNotFooKey("The 'foo' key is missing from the data.")
             await asyncio.sleep(delay)
             return _DATA
 

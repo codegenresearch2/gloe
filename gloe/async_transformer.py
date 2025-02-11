@@ -57,21 +57,21 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         try:
             transformed = await self.transform_async(data)
         except Exception as exception:
-            self.handle_exception(exception)
+            if isinstance(exception.__cause__, TransformerException):
+                raise exception.__cause__
+            else:
+                self.handle_exception(exception)
 
         if transformed is None:
             raise NotImplementedError(f"{self.__class__.__name__} did not return a value")
 
-        return transformed
+        return cast(_Out, transformed)
 
     def validate_input(self, data: _In) -> bool:
         # Add input validation logic here
         return True
 
     def handle_exception(self, exception: Exception):
-        if isinstance(exception, TransformerException):
-            raise exception.internal_exception
-
         tb = traceback.extract_tb(exception.__traceback__)
         transformer_frames = [
             frame

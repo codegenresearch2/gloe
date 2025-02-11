@@ -1,7 +1,6 @@
-from inspect import Signature
-from types import FunctionType
+import inspect
+import warnings
 from typing import Callable, Concatenate, ParamSpec, TypeVar, cast, Awaitable, Generic
-from warnings import warn
 
 from gloe.async_transformer import AsyncTransformer
 from gloe.transformers import Transformer
@@ -11,7 +10,6 @@ P2 = ParamSpec("P2")
 O = TypeVar("O")
 A = TypeVar("A")
 S = TypeVar("S")
-S2 = TypeVar("S2")
 
 class _PartialTransformer(Generic[A, P1, S]):
     def __init__(self, func: Callable[Concatenate[A, P1], S]):
@@ -19,13 +17,13 @@ class _PartialTransformer(Generic[A, P1, S]):
 
     def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> Transformer[A, S]:
         func = self.func
-        func_signature = Signature.from_callable(func)
+        func_signature = inspect.signature(func)
 
         class LambdaTransformer(Transformer[A, S]):
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
 
-            def signature(self) -> Signature:
+            def signature(self) -> inspect.Signature:
                 return func_signature
 
             def transform(self, data: A) -> S:
@@ -84,13 +82,13 @@ class _PartialAsyncTransformer(Generic[A, P1, S]):
 
     def __call__(self, *args: P1.args, **kwargs: P1.kwargs) -> AsyncTransformer[A, S]:
         func = self.func
-        func_signature = Signature.from_callable(func)
+        func_signature = inspect.signature(func)
 
         class LambdaTransformer(AsyncTransformer[A, S]):
             __doc__ = func.__doc__
             __annotations__ = cast(FunctionType, func).__annotations__
 
-            def signature(self) -> Signature:
+            def signature(self) -> inspect.Signature:
                 return func_signature
 
             async def transform_async(self, data: A) -> S:
@@ -169,10 +167,10 @@ def transformer(func: Callable[[A], S]) -> Transformer[A, S]:
         An instance of the Transformer class, encapsulating the transformation logic
         defined in the provided callable.
     """
-    func_signature = Signature.from_callable(func)
+    func_signature = inspect.signature(func)
 
     if len(func_signature.parameters) > 1:
-        warn(
+        warnings.warn(
             "Only one parameter is allowed on Transformers. "
             f"Function '{func.__name__}' has the following signature: {func_signature}. "
             "To pass a complex data, use a complex type like named tuples, "
@@ -184,7 +182,7 @@ def transformer(func: Callable[[A], S]) -> Transformer[A, S]:
         __doc__ = func.__doc__
         __annotations__ = cast(FunctionType, func).__annotations__
 
-        def signature(self) -> Signature:
+        def signature(self) -> inspect.Signature:
             return func_signature
 
         def transform(self, data):
@@ -217,10 +215,10 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
         Returns an instance of the AsyncTransformer class, representing the built async
         transformer.
     """
-    func_signature = Signature.from_callable(func)
+    func_signature = inspect.signature(func)
 
     if len(func_signature.parameters) > 1:
-        warn(
+        warnings.warn(
             "Only one parameter is allowed on Transformers. "
             f"Function '{func.__name__}' has the following signature: {func_signature}. "
             "To pass a complex data, use a complex type like named tuples, "
@@ -232,7 +230,7 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
         __doc__ = func.__doc__
         __annotations__ = cast(FunctionType, func).__annotations__
 
-        def signature(self) -> Signature:
+        def signature(self) -> inspect.Signature:
             return func_signature
 
         async def transform_async(self, data):

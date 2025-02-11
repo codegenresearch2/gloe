@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",  # Commented out as per oracle feedback
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -34,9 +34,9 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per oracle feedback
+# ogp_site_url = "https://gloe.ideos.com.br/"  # Commented out as per oracle feedback
+# ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"  # Commented out as per oracle feedback
 
 templates_path = ["_templates"]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]

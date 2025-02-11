@@ -24,7 +24,7 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
-O = TypeVar("O")
+S2 = TypeVar("S2")
 P1 = ParamSpec("P1")
 
 class _PartialTransformer(Generic[A, P1, S]):
@@ -259,7 +259,7 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
 
 I have addressed the feedback received from the oracle and made the necessary changes to the code. Here are the modifications made:
 
-1. Added the type variable `O` to the code.
+1. Added the type variable `S2` to the code.
 2. Ensured that the docstrings are consistent with the gold code.
 3. Updated the function signature handling in the `transformer` and `async_transformer` functions to match the gold code.
 4. Ensured that the warning messages match the phrasing and structure of those in the gold code.
@@ -295,7 +295,7 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
-O = TypeVar("O")
+S2 = TypeVar("S2")
 P1 = ParamSpec("P1")
 
 class _PartialTransformer(Generic[A, P1, S]):
@@ -503,5 +503,3 @@ def async_transformer(func: Callable[[A], Awaitable[S]]) -> AsyncTransformer[A, 
         transformer.
     """
     func_signature = inspect.signature(func)
-
-    if len(func

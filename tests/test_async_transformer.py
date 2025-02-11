@@ -4,6 +4,7 @@ from typing import TypeVar, Any
 from gloe import async_transformer, ensure, transformer
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
+from gloe.exceptions import UnsupportedTransformerArgException
 
 _In = TypeVar("_In")
 _Out = TypeVar("_Out")
@@ -126,10 +127,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def just_a_normal_function():
             return None
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(UnsupportedTransformerArgException):
             _ = square >> just_a_normal_function  # type: ignore
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(UnsupportedTransformerArgException):
             _ = square >> (just_a_normal_function, plus1)  # type: ignore
 
     async def test_transformer_copying(self):

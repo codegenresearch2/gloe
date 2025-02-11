@@ -10,6 +10,7 @@ P2 = ParamSpec("P2")
 O = TypeVar("O")
 A = TypeVar("A")
 S = TypeVar("S")
+S2 = TypeVar("S2")
 
 class _PartialTransformer(Generic[A, P1, S]):
     def __init__(self, func: Callable[Concatenate[A, P1], S]):

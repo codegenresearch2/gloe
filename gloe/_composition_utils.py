@@ -12,10 +12,15 @@ _Out = TypeVar("_Out")
 _NextOut = TypeVar("_NextOut")
 
 def is_transformer(node):
+    if type(node) == list or type(node) == tuple:
+        return all(isinstance(n, Transformer) for n in node)
     return isinstance(node, Transformer)
 
 def is_async_transformer(node):
     return isinstance(node, AsyncTransformer)
+
+def has_any_async_transformer(node: list):
+    return any(is_async_transformer(n) for n in node)
 
 def _resolve_new_merge_transformers(new_transformer: BaseTransformer, transformer2: BaseTransformer):
     new_transformer.__class__.__name__ = transformer2.__class__.__name__
@@ -58,30 +63,35 @@ def _merge_serial(transformer1, transformer2):
         def __len__(self):
             return len(transformer1) + len(transformer2)
 
+    new_transformer: BaseTransformer | None = None
     if is_transformer(transformer1) and is_transformer(transformer2):
-        class NewTransformer(BaseNewTransformer, Transformer[_In, _NextOut]):
+        class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
                 return transformer2(transformer1(data))
+        new_transformer = NewTransformer1()
 
     elif is_async_transformer(transformer1) and is_transformer(transformer2):
-        class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
+        class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 return transformer2(await transformer1(data))
+        new_transformer = NewTransformer2()
 
     elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
-        class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
+        class NewTransformer3(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 return await transformer2(await transformer1(data))
+        new_transformer = NewTransformer3()
 
     elif is_transformer(transformer1) and is_async_transformer(transformer2):
-        class NewTransformer(AsyncTransformer[_In, _NextOut]):
+        class NewTransformer4(AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 return await transformer2(transformer1(data))
+        new_transformer = NewTransformer4()
 
     else:
         raise UnsupportedTransformerArgException(transformer2)
 
-    return _resolve_new_merge_transformers(NewTransformer(), transformer2)
+    return _resolve_new_merge_transformers(new_transformer, transformer2)
 
 def _merge_diverging(incident_transformer, *receiving_transformers):
     if incident_transformer.previous is None:
@@ -116,14 +126,16 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
         def __len__(self):
             return sum(len(t) for t in receiving_transformers) + len(incident_transformer)
 
+    new_transformer = None
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
-        class NewTransformer(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
+        class NewTransformer1(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
             def transform(self, data: _In) -> tuple[Any, ...]:
                 intermediate_result = incident_transformer(data)
                 return tuple(receiving_transformer(intermediate_result) for receiving_transformer in receiving_transformers)
+        new_transformer = NewTransformer1()
 
     else:
-        class NewTransformer(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
+        class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):
             async def transform_async(self, data: _In) -> tuple[Any, ...]:
                 intermediate_result = await incident_transformer(data) if asyncio.iscoroutinefunction(incident_transformer.__call__) else incident_transformer(data)
                 outputs = []
@@ -131,8 +143,8 @@ def _merge_diverging(incident_transformer, *receiving_transformers):
                     output = await receiving_transformer(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.__call__) else receiving_transformer(intermediate_result)
                     outputs.append(output)
                 return tuple(outputs)
+        new_transformer = NewTransformer2()
 
-    new_transformer = NewTransformer()
     new_transformer._previous = cast(Transformer, receiving_transformers)
     new_transformer.__class__.__name__ = "Converge"
     new_transformer._label = ""

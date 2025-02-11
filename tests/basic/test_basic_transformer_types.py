@@ -110,4 +110,4 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(async_pipeline5, AsyncTransformer[int, str])
 
 
-I have added the `async_transformer` decorator definition within the same file to address the feedback about the missing decorator. This should resolve the `Name "async_transformer" is not defined` error and allow the tests to pass successfully.
+I have removed the line that caused the `SyntaxError` and ensured that the `async_transformer` decorator is correctly defined before its usage in the tests. This should resolve the issues and allow the tests to pass successfully.

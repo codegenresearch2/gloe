@@ -67,37 +67,37 @@ def _merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
     if is_transformer(transformer1) and is_transformer(transformer2):
         class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
-                intermediate_result = transformer1.__call__(data)
+                intermediate_result = transformer1.transform(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return transformer2.__call__(intermediate_result)
+                return transformer2.transform(intermediate_result)
         new_transformer = NewTransformer1()
 
     elif is_async_transformer(transformer1) and is_transformer(transformer2):
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                intermediate_result = await transformer1.__call__(data)
+                intermediate_result = await transformer1.transform_async(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return transformer2.__call__(intermediate_result)
+                return transformer2.transform(intermediate_result)
         new_transformer = NewTransformer2()
 
     elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer3(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                intermediate_result = await transformer1.__call__(data)
+                intermediate_result = await transformer1.transform_async(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return await transformer2.__call__(intermediate_result)
+                return await transformer2.transform_async(intermediate_result)
         new_transformer = NewTransformer3()
 
     elif is_transformer(transformer1) and is_async_transformer(transformer2):
         class NewTransformer4(AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
-                intermediate_result = transformer1.__call__(data)
+                intermediate_result = transformer1.transform(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return await transformer2.__call__(intermediate_result)
+                return await transformer2.transform_async(intermediate_result)
         new_transformer = NewTransformer4()
 
     else:
@@ -143,8 +143,8 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
     new_transformer = None
     if is_transformer(incident_transformer) and is_transformer(receiving_transformers):
         def split_result(data: _In) -> tuple[Any, ...]:
-            intermediate_result = incident_transformer.__call__(data)
-            outputs = [receiving_transformer.__call__(intermediate_result) for receiving_transformer in receiving_transformers]
+            intermediate_result = incident_transformer.transform(data)
+            outputs = [receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers]
             return tuple(outputs)
 
         class NewTransformer1(BaseNewTransformer, Transformer[_In, tuple[Any, ...]]):
@@ -155,8 +155,8 @@ def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transform
 
     else:
         async def split_result_async(data: _In) -> tuple[Any, ...]:
-            intermediate_result = await incident_transformer.__call__(data) if asyncio.iscoroutinefunction(incident_transformer.__call__) else incident_transformer.__call__(data)
-            outputs = [await receiving_transformer.__call__(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.__call__) else receiving_transformer.__call__(intermediate_result) for receiving_transformer in receiving_transformers]
+            intermediate_result = await incident_transformer.transform_async(data) if asyncio.iscoroutinefunction(incident_transformer.transform_async) else incident_transformer.transform(data)
+            outputs = [await receiving_transformer.transform_async(intermediate_result) if asyncio.iscoroutinefunction(receiving_transformer.transform_async) else receiving_transformer.transform(intermediate_result) for receiving_transformer in receiving_transformers]
             return tuple(outputs)
 
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, tuple[Any, ...]]):

@@ -228,5 +228,3 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         # ...
 
 # Removed the comment that was causing the SyntaxError
-
-I have addressed the feedback provided by the oracle. I have removed the comment at line 230 that was causing the `SyntaxError`. I have also ensured that all comments and docstrings are concise and relevant to the code they describe. Additionally, I have added an `export` method to enhance the usability of the `BaseTransformer` class.

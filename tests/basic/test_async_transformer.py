@@ -14,6 +14,23 @@ _In = TypeVar("_In")
 _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
+# Define async transformers
+@async_transformer
+async def request_data(url: str) -> dict[str, str]:
+    """
+    Async transformer that requests data from a given URL.
+    """
+    await asyncio.sleep(0.01)
+    return _DATA
+
+class RequestData(AsyncTransformer[str, dict[str, str]]):
+    """
+    Async transformer class that requests data from a given URL.
+    """
+    async def transform_async(self, url: str) -> dict[str, str]:
+        await asyncio.sleep(0.01)
+        return _DATA
+
 # Define custom exceptions
 class HasNotBarKey(Exception):
     pass
@@ -50,23 +67,6 @@ def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
 
     if "foo" in outcome.keys():
         raise HasFooKey()
-
-# Define async transformers
-@async_transformer
-async def request_data(url: str) -> dict[str, str]:
-    """
-    Async transformer that requests data from a given URL.
-    """
-    await asyncio.sleep(0.01)
-    return _DATA
-
-class RequestData(AsyncTransformer[str, dict[str, str]]):
-    """
-    Async transformer class that requests data from a given URL.
-    """
-    async def transform_async(self, url: str) -> dict[str, str]:
-        await asyncio.sleep(0.01)
-        return _DATA
 
 # Define test cases
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
@@ -213,3 +213,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         test2 = forward[float]() >> (async_plus1, async_plus1)
         result2 = await test2.transform_async(5)
         self.assertIsNone(result2)
+
+async def raise_an_error():
+    """
+    Async function that raises a NotImplementedError.
+    """
+    await asyncio.sleep(0.1)
+    raise NotImplementedError()

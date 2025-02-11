@@ -1,4 +1,4 @@
-from typing import TypeVar, Tuple
+from typing import TypeVar, Union
 from typing_extensions import assert_type
 
 from gloe import Transformer, async_transformer, AsyncTransformer
@@ -37,28 +37,22 @@ class TestBasicTransformerTypes(MypyTestSuite):
         Test the transformer typing with a divergent flow that results in a tuple of different types
         """
         graph2 = square >> square_root >> (to_string, square)
-        assert_type(graph2, Transformer[float, Tuple[str, float]])
+        assert_type(graph2, Transformer[float, tuple[str, float]])
 
         graph3 = square >> square_root >> (to_string, square, to_string)
-        assert_type(graph3, Transformer[float, Tuple[str, float, str]])
+        assert_type(graph3, Transformer[float, tuple[str, float, str]])
 
         graph4 = square >> square_root >> (to_string, square, to_string, square)
-        assert_type(graph4, Transformer[float, Tuple[str, float, str, float]])
+        assert_type(graph4, Transformer[float, tuple[str, float, str, float]])
 
-        graph5 = (
-            square >> square_root >> (to_string, square, to_string, square, to_string)
-        )
-        assert_type(graph5, Transformer[float, Tuple[str, float, str, float, str]])
+        graph5 = square >> square_root >> (to_string, square, to_string, square, to_string)
+        assert_type(graph5, Transformer[float, tuple[str, float, str, float, str]])
 
-        graph6 = (
-            square >> square_root >> (to_string, square, to_string, square, to_string, square)
-        )
-        assert_type(graph6, Transformer[float, Tuple[str, float, str, float, str, float]])
+        graph6 = square >> square_root >> (to_string, square, to_string, square, to_string, square)
+        assert_type(graph6, Transformer[float, tuple[str, float, str, float, str, float]])
 
-        graph7 = (
-            square >> square_root >> (to_string, square, to_string, square, to_string, square, to_string)
-        )
-        assert_type(graph7, Transformer[float, Tuple[str, float, str, float, str, float, str]])
+        graph7 = square >> square_root >> (to_string, square, to_string, square, to_string, square, to_string)
+        assert_type(graph7, Transformer[float, tuple[str, float, str, float, str, float, str]])
 
     def test_bridge(self):
         """
@@ -66,7 +60,7 @@ class TestBasicTransformerTypes(MypyTestSuite):
         """
         num_bridge = bridge[float]("num")
         graph = plus1 >> num_bridge.pick() >> minus1 >> num_bridge.drop()
-        assert_type(graph, Transformer[float, Tuple[float, float]])
+        assert_type(graph, Transformer[float, tuple[float, float]])
 
     def test_async_transformer(self):
         """
@@ -85,6 +79,6 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(_square, AsyncTransformer[int, float])
         assert_type(async_pipeline, AsyncTransformer[int, str])
         assert_type(async_pipeline2, AsyncTransformer[int, str])
-        assert_type(async_pipeline3, AsyncTransformer[int, Tuple[float, str]])
-        assert_type(async_pipeline4, AsyncTransformer[int, Tuple[str, float]])
+        assert_type(async_pipeline3, AsyncTransformer[int, tuple[float, str]])
+        assert_type(async_pipeline4, AsyncTransformer[int, tuple[str, float]])
         assert_type(async_pipeline5, AsyncTransformer[int, str])

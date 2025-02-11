@@ -68,12 +68,28 @@ AsyncNext7 = Union[
 ]
 
 class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
+    """
+    A Transformer is the generic block with the responsibility to take an input of type
+    `T` and transform it to an output of type `S`.
+
+    See Also:
+        Read more about this feature in the page :ref:`creating-a-transformer`.
+
+    Example:
+        Typical usage example::
+
+            class Stringifier(Transformer[dict, str]):
+                ...
+
+    """
+
     def __init__(self):
         super().__init__()
         self.__class__.__annotations__ = self.transform.__annotations__
 
     @abstractmethod
     def transform(self, data: I) -> O:
+        """Main method to be implemented and responsible to perform the transformer logic"""
         if not self.validate_input(data):
             raise ValueError("Invalid input data")
 
@@ -97,9 +113,12 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         except Exception as exception:
             if isinstance(exception, TransformerException):
                 transform_exception = exception
+            elif isinstance(exception.__cause__, TransformerException):
+                transform_exception = exception.__cause__
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
+                # TODO: Make this filter condition stronger
                 transformer_frames = [
                     frame
                     for frame in tb
@@ -249,6 +268,3 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         # Add your next node validation logic here
         # Return True if the next node is valid, False otherwise
         pass
-
-
-In the rewritten code, I have added input validation to the `transform` method using the `validate_input` method. I have also added a `validate_next_node` method to validate the next node in the `__rshift__` method. Additionally, I have imported the `_compose_nodes` function from `gloe/_composition_utils.py` and called it in the `__rshift__` method to enhance functionality with additional key checks.

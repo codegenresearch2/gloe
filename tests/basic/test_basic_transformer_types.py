@@ -1,4 +1,4 @@
-from typing import TypeVar, Union
+from typing import TypeVar
 from typing_extensions import assert_type
 from gloe import Transformer, AsyncTransformer
 from gloe.experimental import bridge

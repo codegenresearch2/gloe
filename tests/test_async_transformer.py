@@ -31,6 +31,10 @@ class IsNotInt(Exception):
     pass
 
 
+class IsNotStr(Exception):
+    pass
+
+
 def has_foo_key(dict: dict[str, str]) -> bool:
     return "foo" in dict
 
@@ -41,6 +45,10 @@ def has_bar_key(dict: dict[str, str]) -> bool:
 
 def is_int(data: Any) -> bool:
     return isinstance(data, int)
+
+
+def is_str(data: Any) -> bool:
+    return isinstance(data, str)
 
 
 _URL = "http://my-service"

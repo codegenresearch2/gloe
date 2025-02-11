@@ -4,7 +4,7 @@ from types import FunctionType
 from typing import Any, Callable, Generic, ParamSpec, Sequence, TypeVar, cast
 
 from gloe.async_transformer import AsyncTransformer
-from gloe.functional import partial_transformer, partial_async_transformer
+from gloe.functional import _PartialTransformer, _PartialAsyncTransformer
 from gloe.transformers import Transformer
 
 _T = TypeVar("_T")
@@ -75,7 +75,7 @@ class _ensure_base:
             return self._generate_new_transformer(arg)
         if isinstance(arg, AsyncTransformer):
             return self._generate_new_async_transformer(arg)
-        if isinstance(arg, partial_transformer):
+        if isinstance(arg, _PartialTransformer):
             transformer_init = arg
 
             def ensured_transformer_init(*args, **kwargs):
@@ -83,7 +83,7 @@ class _ensure_base:
                 return self._generate_new_transformer(transformer)
 
             return ensured_transformer_init
-        if isinstance(arg, partial_async_transformer):
+        if isinstance(arg, _PartialAsyncTransformer):
             async_transformer_init = arg
 
             def ensured_async_transformer_init(*args, **kwargs):

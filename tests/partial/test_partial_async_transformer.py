@@ -3,6 +3,9 @@ import unittest
 from gloe import partial_async_transformer
 from gloe.utils import forward
 
+# Define the global variable _DATA at the top of the file
+_DATA = {"foo": "bar"}
+
 class TestPartialAsyncTransformer(unittest.TestCase):
 
     async def test_partial_async_transformer(self):

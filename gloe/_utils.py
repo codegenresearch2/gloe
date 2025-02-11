@@ -24,7 +24,7 @@ def _format_union(union_annotation: Union, generic_input_param, input_annotation
     return f"({' | '.join(formatted)})"
 
 def _format_generic_alias(generic_alias: GenericAlias, generic_input_param, input_annotation) -> str:
-    alias_name = generic_alias.__name__
+    alias_name = generic_alias.__origin__.__name__
     formatted: list[str] = []
     for annotation in generic_alias.__args__:
         formatted.append(_format_return_annotation(annotation, generic_input_param, input_annotation))
@@ -35,7 +35,7 @@ def _format_return_annotation(return_annotation, generic_input_param, input_anno
         return return_annotation
     if type(return_annotation) == tuple:
         return _format_tuple(return_annotation, generic_input_param, input_annotation)
-    if return_annotation.__name__ == 'tuple':
+    if return_annotation.__name__ in {'tuple', 'Tuple'}:
         return _format_tuple(return_annotation.__args__, generic_input_param, input_annotation)
     if return_annotation.__name__ == 'Union':
         return _format_union(return_annotation, generic_input_param, input_annotation)

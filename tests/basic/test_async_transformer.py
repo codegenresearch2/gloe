@@ -16,35 +16,44 @@ _URL = "http://my-service"
 
 # Define custom exceptions
 class HasNotBarKey(Exception):
+    """Exception raised when the data does not have a 'bar' key."""
     pass
 
 class HasNotFooKey(Exception):
+    """Exception raised when the data does not have a 'foo' key."""
     pass
 
 class HasFooKey(Exception):
+    """Exception raised when the data has a 'foo' key."""
     pass
 
 class IsNotInt(Exception):
+    """Exception raised when the data is not an integer."""
     pass
 
 # Define helper functions
 def has_bar_key(data: dict[str, str]):
+    """Check if the data has a 'bar' key."""
     if "bar" not in data.keys():
         raise HasNotBarKey()
 
 def has_foo_key(data: dict[str, str]):
+    """Check if the data has a 'foo' key."""
     if "foo" not in data.keys():
         raise HasNotBarKey()
 
 def is_int(data: Any):
+    """Check if the data is an integer."""
     if type(data) is not int:
         raise IsNotInt()
 
 def is_str(data: Any):
+    """Check if the data is a string."""
     if type(data) is not str:
         raise Exception("data is not string")
 
 def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
+    """Check if the 'foo' key has been removed from the data."""
     if "foo" not in incoming.keys():
         raise HasNotFooKey()
     if "foo" in outcome.keys():
@@ -66,6 +75,7 @@ class RequestData(AsyncTransformer[str, dict[str, str]]):
 # Define test cases
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     """Test cases for async transformers."""
+
     async def test_basic_case(self):
         """Test the basic case of an async transformer."""
         test_forward = request_data >> forward()

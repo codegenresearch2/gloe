@@ -1,8 +1,11 @@
 # Configuration file for the Sphinx documentation builder.
+# For more information about the configuration options, see:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
 
 # -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 sys.path.insert(0, os.path.abspath("../.."))
 sys.path.insert(0, os.path.abspath("pygments"))
 
@@ -12,6 +15,7 @@ author = "Samir Braga"
 release = "0.4.3"
 
 # -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 extensions = [
     "sphinx_toolbox.more_autodoc.variables",
     "sphinx.ext.autosectionlabel",
@@ -21,6 +25,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
+    # "sphinx_autodoc_typehints",  # Consider including this extension
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -36,8 +41,12 @@ ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 # HTML output options
 html_title = "Gloe"
+# html_logo = "assets/gloe-logo-small.png"  # Consider including this option
 html_theme = "furo"
 html_last_updated_fmt = ""
+# html_use_index = False  # Consider including this option
+# html_domain_indices = False  # Consider including this option
+# html_copy_source = False  # Consider including this option
 html_sidebars = {
     "Home": ["/"],
 }
@@ -47,7 +56,7 @@ html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
-    "dark_css_variables": {
+    "light_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
@@ -70,3 +79,12 @@ html_theme_options = {
 
 # Pygments style options
 pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"
+
+# Additional options
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}

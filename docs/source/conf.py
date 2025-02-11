@@ -49,6 +49,7 @@ autodoc_type_aliases = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = "Gloe"
+# html_logo = "assets/gloe-logo-small.png"  # Added as per gold code
 html_theme = "furo"
 html_last_updated_fmt = ""
 # html_use_index = False  # Commented out as per gold code
@@ -57,6 +58,8 @@ html_last_updated_fmt = ""
 html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
+# autodoc_default_options = {"ignore-module-all": True}  # Added as per gold code
+
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"

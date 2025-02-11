@@ -1,5 +1,6 @@
 # Configuration file for the Sphinx documentation builder.
-# For more information about the configuration options, see:
+#
+# For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
@@ -16,6 +17,7 @@ release = "0.4.3"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
 extensions = [
     "sphinx_toolbox.more_autodoc.variables",
     "sphinx.ext.autosectionlabel",
@@ -30,18 +32,24 @@ extensions = [
     # "sphinx_autodoc_typehints",  # Consider including this extension based on the gold code
 ]
 
-# Configuration options
 overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {
-    "httpx": ("https://www.python-httpx.org/", None)
-}  # Include this line based on the gold code
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Include this line based on the gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
-# HTML output options
+templates_path = ["_templates"]
+exclude_patterns = ["Thumbs.db", ".DS_Store"]
+autodoc_typehints = "description"
+autodoc_type_aliases = {
+    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
+}
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
 html_title = "Gloe"
 # html_logo = "assets/gloe-logo-small.png"  # Consider including this option based on the gold code
 html_theme = "furo"
@@ -52,10 +60,13 @@ html_last_updated_fmt = ""
 html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
+# autodoc_default_options = {"ignore-module-all": True}  # Consider including this option based on the gold code
+
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
+    # "main_nav_links": {"Docs": "/index", "About": "/about"},  # Consider including this option based on the gold code
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
     "light_css_variables": {
@@ -86,15 +97,6 @@ html_theme_options = {
     ],
 }
 
-# Pygments style options
 # pygments_style = "styles.GloeStyle"  # Consider including this option based on the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
 pygments_light_style = "styles.GloeLightStyle"
-
-# Additional options
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
-autodoc_typehints = "description"
-autodoc_type_aliases = {
-    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
-}

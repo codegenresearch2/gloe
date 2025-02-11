@@ -3,7 +3,6 @@ import types
 import uuid
 import inspect
 from functools import cached_property
-from inspect import Signature
 from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
@@ -201,15 +200,15 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         elif isinstance(self.previous, BaseTransformer):
             self.previous._set_previous(previous)
 
-    def signature(self) -> Signature:
+    def signature(self) -> inspect.Signature:
         """
         Returns the signature of the transformer's transform method.
 
         This method provides information about the expected parameters and return type of the transform method.
         """
-        return self._signature(type)
+        return self._signature(type(self))
 
-    def _signature(self, klass: type) -> Signature:
+    def _signature(self, klass: type) -> inspect.Signature:
         """
         Helper method to return the signature of the transformer's transform method.
 

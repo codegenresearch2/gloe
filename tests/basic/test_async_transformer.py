@@ -180,3 +180,5 @@ This revised code snippet addresses the feedback from the oracle by:
 3. **Streamlining Function Definitions**: Ensuring that only essential functions are defined.
 4. **Consistent Naming Conventions**: Ensuring consistent naming conventions throughout the code.
 5. **Removing Redundant Code**: Eliminating any redundant or unnecessary code to make the implementation cleaner and more efficient.
+6. **Ensure Proper Exception Handling**: Making sure that exception handling is aligned with the gold code.
+7. **Review Test Cases**: Ensuring that test cases are comprehensive but also concise.

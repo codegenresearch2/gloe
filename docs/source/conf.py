@@ -22,7 +22,7 @@ extensions = [
     # "sphinx.ext.autosummary",  # Commented out in gold code
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",  # Added based on gold code
+    # "sphinx.ext.intersphinx",  # Commented out in gold code
     "sphinxext.opengraph",
     # "sphinx_autodoc_typehints",  # Commented out in gold code
     "myst_parser",
@@ -32,7 +32,7 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Added based on gold code
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out in gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
@@ -46,6 +46,7 @@ autodoc_type_aliases = {
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_title = "Gloe"
+# html_logo = "assets/gloe-logo-small.png"  # Commented out in gold code
 html_theme = "furo"
 html_last_updated_fmt = ""
 # html_use_index = False  # Commented out in gold code
@@ -54,10 +55,13 @@ html_last_updated_fmt = ""
 html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
+# autodoc_default_options = {"ignore-module-all": True}  # Added as a comment to align with gold code
+
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
+    # "main_nav_links": {"Docs": "/index", "About": "/about"},
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
     "light_css_variables": {
@@ -90,4 +94,3 @@ html_theme_options = {
 
 # pygments_style = "styles.GloeStyle"  # Commented out in gold code
 pygments_dark_style = "styles.GloeDarkStyle"
-pygments_light_style = "styles.GloeLightStyle"

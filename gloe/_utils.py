@@ -9,7 +9,7 @@ from typing import (
     ParamSpec,
     Callable,
     Awaitable,
-)
+)  # type: ignore
 
 def _format_tuple_annotation(tuple_annotation, generic_input_param, input_annotation) -> str:
     formatted: list[str] = []

@@ -8,7 +8,6 @@ from gloe import (
     async_transformer,
     AsyncTransformer,
 )
-from gloe.utils import forward
 from tests.lib.transformers import (
     square,
     square_root,
@@ -29,8 +28,6 @@ Out = TypeVar("Out")
 
 
 class TestTransformerTypes(MypyTestSuite):
-    mypy_result: str = ""
-
     def test_conditioned_flow_types(self):
         """
         Test conditioned flow types with if_not_zero and if_is_even

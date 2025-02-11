@@ -16,7 +16,7 @@ _NextOut = TypeVar("_NextOut")
 
 
 def is_transformer(node: Any) -> bool:
-    return isinstance(node, (list, tuple)) or type(node) == list or type(node) == tuple
+    return isinstance(node, (list, tuple)) and all(isinstance(n, BaseTransformer) for n in node)
 
 
 def is_async_transformer(node: Any) -> bool:

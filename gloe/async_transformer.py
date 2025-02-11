@@ -54,13 +54,12 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         return f"{self.input_annotation} -> ({type(self).__name__}) -> {self.output_annotation}"
 
     async def __call__(self, data: _In) -> _Out:
-        transform_exception = None
-
+        transformed: _Out | None = None
         try:
             transformed = await self.transform_async(data)
         except Exception as exception:
-            if exception.__cause__ == TransformerException:
-                transform_exception = exception.__cause__
+            if type(exception.__cause__) == TransformerException:
+                raise exception.__cause__
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
@@ -84,19 +83,16 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
                         f'An error occurred in transformer "{self.__class__.__name__}"'
                     )
 
-                transform_exception = AsyncTransformerException(
+                raise AsyncTransformerException(
                     internal_exception=exception,
                     raiser_transformer=self,
                     message=exception_message,
                 )
 
-        if transform_exception is not None:
-            raise transform_exception
+        if transformed is None:
+            raise NotImplementedError
 
-        if type(transformed) is not None:
-            return cast(_Out, transformed)
-
-        raise NotImplementedError
+        return transformed
 
     def copy(self, transform: Callable[[BaseTransformer, _In], Awaitable[_Out]] | None = None, regenerate_instance_id: bool = False) -> "AsyncTransformer[_In, _Out]":
         copied = copy.copy(self)

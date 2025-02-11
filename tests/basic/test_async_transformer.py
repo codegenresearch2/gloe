@@ -1,7 +1,6 @@
 import asyncio
 import unittest
 from typing import TypeVar, Any, cast
-
 from gloe import (
     async_transformer,
     ensure,
@@ -13,66 +12,41 @@ from gloe import (
 from gloe.async_transformer import _execute_async_flow
 from gloe.functional import partial_async_transformer
 from gloe.utils import forward
-from tests.lib.exceptions import LnOfNegativeNumber
-from tests.lib.transformers import async_plus1, async_natural_logarithm
-
-_In = TypeVar("_In")
+from tests.lib.ensurers import is_odd
+from tests.lib.exceptions import LnOfNegativeNumber, NumbersEqual, NumberIsEven
+from tests.lib.transformers import async_plus1, async_natural_logarithm, minus1
 
 _DATA = {"foo": "bar"}
 
-
-async def raise_an_error():
-    await asyncio.sleep(0.1)
-    raise NotImplementedError()
-
-
-@async_transformer
-async def request_data(url: str) -> dict[str, str]:
-    await asyncio.sleep(0.01)
-    return _DATA
-
-
-class RequestData(AsyncTransformer[str, dict[str, str]]):
-    async def transform_async(self, url: str) -> dict[str, str]:
-        await asyncio.sleep(0.01)
-        return _DATA
-
+_URL = "http://my-service"
 
 class HasNotBarKey(Exception):
     pass
 
-
 class HasNotFooKey(Exception):
     pass
-
 
 class HasFooKey(Exception):
     pass
 
-
 class IsNotInt(Exception):
     pass
-
 
 def has_bar_key(data: dict[str, str]):
     if "bar" not in data.keys():
         raise HasNotBarKey()
 
-
 def has_foo_key(data: dict[str, str]):
     if "foo" not in data.keys():
-        raise HasNotBarKey()
-
+        raise HasNotFooKey()
 
 def is_int(data: Any):
     if type(data) is not int:
         raise IsNotInt()
 
-
 def is_str(data: Any):
     if type(data) is not str:
         raise Exception("data is not string")
-
 
 def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
     if "foo" not in incoming.keys():
@@ -81,9 +55,15 @@ def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
     if "foo" in outcome.keys():
         raise HasFooKey()
 
+@async_transformer
+async def request_data(url: str) -> dict[str, str]:
+    await asyncio.sleep(0.01)
+    return _DATA
 
-_URL = "http://my-service"
-
+class RequestData(AsyncTransformer[str, dict[str, str]]):
+    async def transform_async(self, url: str) -> dict[str, str]:
+        await asyncio.sleep(0.01)
+        return _DATA
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
@@ -146,7 +126,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         result = await pipeline(_URL)
         self.assertEqual(_DATA, result)
 
-    def test_async_transformer_wrong_signature(self):
+    async def test_async_transformer_wrong_signature(self):
         with self.assertWarns(RuntimeWarning):
 
             @async_transformer  # type: ignore
@@ -154,12 +134,12 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
                 await asyncio.sleep(1)
                 return arg1, arg2
 
-    def test_async_transformer_signature_representation(self):
+    async def test_async_transformer_signature_representation(self):
         signature = request_data.signature()
 
         self.assertEqual(str(signature), "(url: str) -> dict[str, str]")
 
-    def test_async_transformer_representation(self):
+    async def test_async_transformer_representation(self):
         self.assertEqual(repr(request_data), "str -> (request_data) -> dict[str, str]")
 
         class_request_data = RequestData()

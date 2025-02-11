@@ -65,8 +65,6 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
                     message="Transform method did not return a valid result",
                 )
             return cast(_Out, result)
-        except TransformerException as e:
-            raise e
         except Exception as e:
             tb = traceback.extract_tb(e.__traceback__)
             transformer_frames = [

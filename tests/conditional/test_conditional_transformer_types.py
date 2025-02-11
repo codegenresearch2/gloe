@@ -1,7 +1,7 @@
 from typing import TypeVar, Union
 from typing_extensions import assert_type
 
-from gloe import Transformer, AsyncTransformer, if_not_zero, if_is_even, async_transformer
+from gloe import Transformer, AsyncTransformer, if_not_zero, if_is_even
 from gloe.utils import forward
 from tests.lib.transformers import square, square_root, plus1, minus1, to_string, async_plus1
 from tests.type_utils.mypy_test_suite import MypyTestSuite
@@ -9,20 +9,30 @@ from tests.type_utils.mypy_test_suite import MypyTestSuite
 In = TypeVar("In")
 Out = TypeVar("Out")
 
-CONDITIONED_GRAPH = square >> square_root >> if_not_zero.Then(plus1).Else(minus1)
-CONDITIONED_GRAPH2 = square >> square_root >> if_not_zero.Then(to_string).Else(square)
-CHAINED_CONDITIONS_GRAPH = if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
-ASYNC_CHAINED_CONDITIONS_GRAPH1 = if_is_even.Then(async_plus1).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
-ASYNC_CHAINED_CONDITIONS_GRAPH2 = if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(async_plus1).ElseNone()
-
 class TestTransformerTypes(MypyTestSuite):
     def test_conditioned_flow_types(self):
-        assert_type(CONDITIONED_GRAPH, Transformer[float, float])
-        assert_type(CONDITIONED_GRAPH2, Transformer[float, Union[str, float]])
+        """
+        Test the typing of conditioned transformer flows.
+        """
+        conditioned_graph = square >> square_root >> if_not_zero.Then(plus1).Else(minus1)
+        assert_type(conditioned_graph, Transformer[float, float])
+
+        conditioned_graph2 = square >> square_root >> if_not_zero.Then(to_string).Else(square)
+        assert_type(conditioned_graph2, Transformer[float, Union[str, float]])
 
     def test_chained_condition_flow_types(self):
-        assert_type(CHAINED_CONDITIONS_GRAPH, Transformer[float, Union[float, str, None]])
+        """
+        Test the typing of chained conditioned transformer flows.
+        """
+        chained_conditions_graph = if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
+        assert_type(chained_conditions_graph, Transformer[float, Union[float, str, None]])
 
     def test_async_chained_condition_flow_types(self):
-        assert_type(ASYNC_CHAINED_CONDITIONS_GRAPH1, AsyncTransformer[float, Union[float, str, None]])
-        assert_type(ASYNC_CHAINED_CONDITIONS_GRAPH2, AsyncTransformer[float, Union[float, None]])
+        """
+        Test the typing of asynchronous chained conditioned transformer flows.
+        """
+        async_chained_conditions_graph1 = if_is_even.Then(async_plus1).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
+        assert_type(async_chained_conditions_graph1, AsyncTransformer[float, Union[float, str, None]])
+
+        async_chained_conditions_graph2 = if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(async_plus1).ElseNone()
+        assert_type(async_chained_conditions_graph2, AsyncTransformer[float, Union[float, None]])

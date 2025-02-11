@@ -1,95 +1,105 @@
-import asyncio
-import inspect
-import os
-import re
-import unittest
-from pathlib import Path
-from typing import TypeVar, Iterable, Union
+from typing import TypeVar
 from typing_extensions import assert_type
 
 from gloe import (
     Transformer,
-    transformer,
-    partial_transformer,
-    partial_async_transformer,
-    ensure,
     async_transformer,
     AsyncTransformer,
 )
-from gloe.utils import forward
 from gloe.experimental import bridge
-from gloe.collection import Map
-from mypy import api
-
-from tests.lib.conditioners import if_not_zero, if_is_even
-from tests.lib.ensurers import is_even, same_value, same_value_int, is_greater_than_10
+from gloe.utils import forward
 from tests.lib.transformers import (
     square,
     square_root,
     plus1,
     minus1,
     to_string,
-    logarithm,
-    repeat,
-    format_currency,
     tuple_concatenate,
-    async_plus1,
 )
 from tests.type_utils.mypy_test_suite import MypyTestSuite
 
 In = TypeVar("In")
 Out = TypeVar("Out")
 
-class TestTransformerTypes(MypyTestSuite):
-    mypy_result: str
+class TestBasicTransformerTypes(MypyTestSuite):
 
-    def test_conditioned_flow_types(self):
+    def test_transformer_simple_typing(self):
         """
-        Test the conditioned graph for correct type.
+        Test the most simple transformer typing
         """
-        conditioned_graph = (
-            square >> square_root >> if_not_zero.Then(plus1).Else(minus1)
+        graph = square
+        assert_type(graph, Transformer[float, float])
+
+    def test_simple_flow_typing(self):
+        """
+        Test the most simple transformer typing
+        """
+        graph = square >> square_root
+        assert_type(graph, Transformer[float, float])
+
+    def test_flow_with_mixed_types(self):
+        """
+        Test the most simple transformer typing
+        """
+        graph = square >> square_root >> to_string
+        assert_type(graph, Transformer[float, str])
+
+    def test_divergent_flow_types(self):
+        """
+        Test the most simple transformer typing
+        """
+        graph2 = square >> square_root >> (to_string, square)
+        assert_type(graph2, Transformer[float, tuple[str, float]])
+
+        graph3 = square >> square_root >> (to_string, square, to_string)
+        assert_type(graph3, Transformer[float, tuple[str, float, str]])
+
+        graph4 = square >> square_root >> (to_string, square, to_string, square)
+        assert_type(graph4, Transformer[float, tuple[str, float, str, float]])
+
+        graph5 = (
+            square >> square_root >> (to_string, square, to_string, square, to_string)
         )
-        assert_type(conditioned_graph, Transformer[float, float])
+        assert_type(graph5, Transformer[float, tuple[str, float, str, float, str]])
 
-        conditioned_graph2 = (
-            square >> square_root >> if_not_zero.Then(to_string).Else(square)
-        )
-        assert_type(conditioned_graph2, Transformer[float, Union[str, float]])
-
-    def test_chained_condition_flow_types(self):
-        """
-        Test the chained conditions graph for correct type.
-        """
-        chained_conditions_graph = (
-            if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
+        graph6 = (
+            square
+            >> square_root
+            >> (to_string, square, to_string, square, to_string, square)
         )
         assert_type(
-            chained_conditions_graph, Transformer[float, Union[float, str, None]]
+            graph6, Transformer[float, tuple[str, float, str, float, str, float]]
         )
 
-    def test_async_chained_condition_flow_types(self):
-        """
-        Test the asynchronous chained conditions graph for correct type.
-        """
-        async_chained_conditions_graph = (
-            if_is_even.Then(async_plus1)
-            .ElseIf(lambda x: x < 10)
-            .Then(to_string)
-            .ElseNone()
+        graph7 = (
+            square
+            >> square_root
+            >> (to_string, square, to_string, square, to_string, square, to_string)
         )
         assert_type(
-            async_chained_conditions_graph,
-            AsyncTransformer[float, Union[float, str, None]],
+            graph7, Transformer[float, tuple[str, float, str, float, str, float, str]]
         )
 
-        async_chained_conditions_graph = (
-            if_is_even.Then(square)
-            .ElseIf(lambda x: x < 10)
-            .Then(async_plus1)
-            .ElseNone()
-        )
-        assert_type(
-            async_chained_conditions_graph,
-            AsyncTransformer[float, Union[float, None]],
-        )
+    def test_bridge(self):
+        num_bridge = bridge[float]("num")
+
+        graph = plus1 >> num_bridge.pick() >> minus1 >> num_bridge.drop()
+        assert_type(graph, Transformer[float, tuple[float, float]])
+
+    def test_async_transformer(self):
+        @async_transformer
+        async def _square(num: int) -> float:
+            return float(num * num)
+
+        async_pipeline = _square >> to_string
+        async_pipeline2 = forward[int]() >> _square >> to_string
+        async_pipeline3 = forward[int]() >> (_square, _square >> to_string)
+        async_pipeline4 = _square >> (to_string, forward[float]())
+        async_pipeline5 = _square >> (to_string, forward[float]()) >> tuple_concatenate
+
+        assert_type(_square, AsyncTransformer[int, float])
+        assert_type(async_pipeline, AsyncTransformer[int, str])
+        assert_type(async_pipeline2, AsyncTransformer[int, str])
+        assert_type(async_pipeline3, AsyncTransformer[int, tuple[float, str]])
+        assert_type(async_pipeline4, AsyncTransformer[int, tuple[str, float]])
+        assert_type(async_pipeline5, AsyncTransformer[int, str])

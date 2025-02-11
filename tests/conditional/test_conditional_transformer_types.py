@@ -8,7 +8,6 @@ from gloe import (
     async_transformer,
     AsyncTransformer,
 )
-from gloe.experimental import bridge
 from gloe.utils import forward
 from tests.lib.transformers import (
     square,
@@ -30,10 +29,11 @@ Out = TypeVar("Out")
 
 
 class TestTransformerTypes(MypyTestSuite):
+    mypy_result: str = ""
 
     def test_conditioned_flow_types(self):
         """
-        Test the most simple transformer typing with conditioned flows
+        Test conditioned flow types with if_not_zero and if_is_even
         """
         conditioned_graph = (
             square >> square_root >> if_not_zero.Then(plus1).Else(minus1)
@@ -134,11 +134,17 @@ class TestTransformerTypes(MypyTestSuite):
         )
 
     def test_bridge(self):
+        """
+        Test bridge functionality
+        """
         num_bridge = bridge[float]("num")
         graph = plus1 >> num_bridge.pick() >> minus1 >> num_bridge.drop()
         assert_type(graph, Transformer[float, tuple[float, float]])
 
     def test_async_transformer(self):
+        """
+        Test async transformer functionality
+        """
         @async_transformer
         async def _square(num: int) -> float:
             return float(num * num)

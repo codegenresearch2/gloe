@@ -24,6 +24,8 @@ __all__ = [
 
 A = TypeVar("A")
 S = TypeVar("S")
+S2 = TypeVar("S2")
+O = TypeVar("O")
 P1 = ParamSpec("P1")
 
 class _PartialTransformer(Generic[A, P1, S]):

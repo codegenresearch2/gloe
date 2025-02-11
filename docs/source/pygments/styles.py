@@ -16,7 +16,7 @@ from pygments.token import (
 class GloeLightStyle(Style):
     name = "custom_light"
 
-    # Background and Highlight Colors: Matching the specific values used in the gold code
+    # Style Properties: Matching the specific values used in the gold code
     background_color = "#f7f7f7"
     highlight_color = "#e0e0e0"
     line_number_color = "#555555"

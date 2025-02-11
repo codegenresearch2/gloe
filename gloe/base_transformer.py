@@ -207,7 +207,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
         This method provides information about the expected parameters and return type of the transform method.
         """
-        return self._signature(type(self))
+        return self._signature(type)
 
     def _signature(self, klass: type) -> Signature:
         """

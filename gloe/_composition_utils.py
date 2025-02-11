@@ -22,33 +22,33 @@ def is_transformer(node):
 def is_async_transformer(node):
     return isinstance(node, AsyncTransformer)
 
-def resolve_new_merge_transformers(new_transformer: BaseTransformer, transformer2: BaseTransformer):
-    new_transformer.__class__.__name__ = transformer2.__class__.__name__
-    new_transformer._label = transformer2.label
-    new_transformer._children = transformer2.children
-    new_transformer._invisible = transformer2.invisible
-    new_transformer._graph_node_props = transformer2.graph_node_props
-    new_transformer._set_previous(transformer2.previous)
+def _resolve_new_merge_transformers(new_transformer: BaseTransformer, _transformer2: BaseTransformer):
+    new_transformer.__class__.__name__ = _transformer2.__class__.__name__
+    new_transformer._label = _transformer2.label
+    new_transformer._children = _transformer2.children
+    new_transformer._invisible = _transformer2.invisible
+    new_transformer._graph_node_props = _transformer2.graph_node_props
+    new_transformer._set_previous(_transformer2.previous)
     return new_transformer
 
-def resolve_serial_connection_signatures(transformer2: BaseTransformer, generic_vars: dict, signature2: Signature) -> Signature:
+def _resolve_serial_connection_signatures(transformer2: BaseTransformer, generic_vars: dict, signature2: Signature) -> Signature:
     first_param = list(signature2.parameters.values())[0]
     new_parameter = first_param.replace(annotation=_specify_types(transformer2.input_type, generic_vars))
     new_signature = signature2.replace(parameters=[new_parameter], return_annotation=_specify_types(signature2.return_annotation, generic_vars))
     return new_signature
 
-def merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
+def _merge_serial(transformer1: BaseTransformer, _transformer2: BaseTransformer):
     if transformer1.previous is None:
         transformer1 = transformer1.copy(regenerate_instance_id=True)
 
-    transformer2 = transformer2.copy(regenerate_instance_id=True)
-    transformer2._set_previous(transformer1)
+    _transformer2 = _transformer2.copy(regenerate_instance_id=True)
+    _transformer2._set_previous(transformer1)
 
     signature1: Signature = transformer1.signature()
-    signature2: Signature = transformer2.signature()
+    signature2: Signature = _transformer2.signature()
 
-    input_generic_vars = _match_types(transformer2.input_type, signature1.return_annotation)
-    output_generic_vars = _match_types(signature1.return_annotation, transformer2.input_type)
+    input_generic_vars = _match_types(_transformer2.input_type, signature1.return_annotation)
+    output_generic_vars = _match_types(signature1.return_annotation, _transformer2.input_type)
     generic_vars = {**input_generic_vars, **output_generic_vars}
 
     def transformer1_signature(_) -> Signature:
@@ -58,54 +58,54 @@ def merge_serial(transformer1: BaseTransformer, transformer2: BaseTransformer):
 
     class BaseNewTransformer:
         def signature(self) -> Signature:
-            return resolve_serial_connection_signatures(transformer2, generic_vars, signature2)
+            return _resolve_serial_connection_signatures(_transformer2, generic_vars, signature2)
 
         def __len__(self):
-            return len(transformer1) + len(transformer2)
+            return len(transformer1) + len(_transformer2)
 
     new_transformer: BaseTransformer | None = None
-    if is_transformer(transformer1) and is_transformer(transformer2):
+    if is_transformer(transformer1) and is_transformer(_transformer2):
         class NewTransformer1(BaseNewTransformer, Transformer[_In, _NextOut]):
             def transform(self, data: _In) -> _NextOut:
                 intermediate_result = transformer1(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return transformer2(intermediate_result)
+                return _transformer2(intermediate_result)
         new_transformer = NewTransformer1()
 
-    elif is_async_transformer(transformer1) and is_transformer(transformer2):
+    elif is_async_transformer(transformer1) and is_transformer(_transformer2):
         class NewTransformer2(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 intermediate_result = await transformer1(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return transformer2(intermediate_result)
+                return _transformer2(intermediate_result)
         new_transformer = NewTransformer2()
 
-    elif is_async_transformer(transformer1) and is_async_transformer(transformer2):
+    elif is_async_transformer(transformer1) and is_async_transformer(_transformer2):
         class NewTransformer3(BaseNewTransformer, AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 intermediate_result = await transformer1(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return await transformer2(intermediate_result)
+                return await _transformer2(intermediate_result)
         new_transformer = NewTransformer3()
 
-    elif is_transformer(transformer1) and is_async_transformer(transformer2):
+    elif is_transformer(transformer1) and is_async_transformer(_transformer2):
         class NewTransformer4(AsyncTransformer[_In, _NextOut]):
             async def transform_async(self, data: _In) -> _NextOut:
                 intermediate_result = transformer1(data)
                 if intermediate_result == data:
                     raise RecursionError("Infinite recursion detected")
-                return await transformer2(intermediate_result)
+                return await _transformer2(intermediate_result)
         new_transformer = NewTransformer4()
 
     else:
-        raise UnsupportedTransformerArgException(transformer2)
+        raise UnsupportedTransformerArgException(_transformer2)
 
-    return resolve_new_merge_transformers(new_transformer, transformer2)
+    return _resolve_new_merge_transformers(new_transformer, _transformer2)
 
-def merge_diverging(incident_transformer: BaseTransformer, *receiving_transformers):
+def _merge_diverging(incident_transformer: BaseTransformer, *receiving_transformers):
     if incident_transformer.previous is None:
         incident_transformer = incident_transformer.copy(regenerate_instance_id=True)
 
@@ -172,14 +172,14 @@ def merge_diverging(incident_transformer: BaseTransformer, *receiving_transforme
 
     return new_transformer
 
-def compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer):
-    if isinstance(current, BaseTransformer):
-        if isinstance(next_node, BaseTransformer):
-            return merge_serial(current, next_node)
+def _compose_nodes(current: BaseTransformer, next_node: tuple | BaseTransformer):
+    if issubclass(type(current), BaseTransformer):
+        if issubclass(type(next_node), BaseTransformer):
+            return _merge_serial(current, next_node)
         elif type(next_node) == tuple:
-            is_all_base_transformers = all(isinstance(next_transformer, BaseTransformer) for next_transformer in next_node)
+            is_all_base_transformers = all(issubclass(type(next_transformer), BaseTransformer) for next_transformer in next_node)
             if is_all_base_transformers:
-                return merge_diverging(current, *next_node)
+                return _merge_diverging(current, *next_node)
 
             unsupported_elem = [elem for elem in next_node if not isinstance(elem, BaseTransformer)]
             raise UnsupportedTransformerArgException(unsupported_elem[0])

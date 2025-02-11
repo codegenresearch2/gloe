@@ -25,9 +25,8 @@ O5 = TypeVar("O5")
 O6 = TypeVar("O6")
 O7 = TypeVar("O7")
 
-
-Tr = "Transformer"
-AT = AsyncTransformer
+Tr: TypeAlias = "Transformer"
+AT: TypeAlias = AsyncTransformer
 BT = BaseTransformer[I, O, Any]
 
 AsyncNext2 = Union[
@@ -147,7 +146,7 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         if transform_exception is not None:
             raise transform_exception.internal_exception
 
-        if transformed is not None:
+        if type(transformed) is not None:
             return cast(O, transformed)
 
         raise NotImplementedError

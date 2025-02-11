@@ -3,7 +3,7 @@ import unittest
 from typing import TypeVar
 from gloe import async_transformer, ensure, UnsupportedTransformerArgException
 from gloe.functional import partial_async_transformer
-from gloe.utils import forward
+from gloe.utils import forward, transformer
 
 _In = TypeVar("_In")
 
@@ -19,15 +19,15 @@ def is_string(data: str):
 
 def has_bar_key(dict: dict[str, str]):
     if "bar" not in dict.keys():
-        raise HasNotBarKey
+        raise HasNotBarKey("Input dictionary must contain the 'bar' key")
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
     await asyncio.sleep(0.1)
     return _DATA
 
-@async_transformer
-async def add_slash(url: str) -> str:
+@transformer
+def add_slash(url: str) -> str:
     return url + "/"
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):

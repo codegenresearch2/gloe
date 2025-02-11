@@ -15,17 +15,35 @@ _DATA = {"foo": "bar"}
 _URL = "http://my-service"
 
 # Define custom exceptions
-class DataValidationError(Exception):
-    """Exception raised for data validation errors."""
+class HasNotBarKey(Exception):
+    """Exception raised when the data does not have a 'bar' key."""
+    pass
+
+class HasNotFooKey(Exception):
+    """Exception raised when the data does not have a 'foo' key."""
+    pass
+
+class HasFooKey(Exception):
+    """Exception raised when the data has a 'foo' key."""
     pass
 
 # Define helper functions
-def validate_data(data: dict[str, str], key: str, should_have: bool):
-    """Validate if the data has a specific key."""
-    if should_have and key not in data.keys():
-        raise DataValidationError(f"Data does not have '{key}' key.")
-    if not should_have and key in data.keys():
-        raise DataValidationError(f"Data should not have '{key}' key.")
+def has_bar_key(data: dict[str, str]):
+    """Check if the data has a 'bar' key."""
+    if "bar" not in data.keys():
+        raise HasNotBarKey()
+
+def has_foo_key(data: dict[str, str]):
+    """Check if the data has a 'foo' key."""
+    if "foo" not in data.keys():
+        raise HasNotFooKey()
+
+def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
+    """Check if the 'foo' key has been removed from the data."""
+    if "foo" not in incoming.keys():
+        raise HasNotFooKey()
+    if "foo" in outcome.keys():
+        raise HasFooKey()
 
 # Define async transformers
 @async_transformer
@@ -73,7 +91,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def next_transformer():
             pass
 
-        @ensure(outcome=[lambda data: validate_data(data, 'bar', True)])
+        @ensure(outcome=[has_bar_key])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)

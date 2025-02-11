@@ -15,12 +15,24 @@ class HasNotBarKey(Exception):
 
 
 def is_string(data: any) -> bool:
-    return isinstance(data, str)
+    if not isinstance(data, str):
+        raise ValueError("Input must be a string")
+    return True
 
 
 def has_bar_key(dict: dict[str, str]):
     if "bar" not in dict.keys():
         raise HasNotBarKey()
+
+
+def square(num: float) -> float:
+    return num * num
+
+
+def square_root(num: float) -> float:
+    if num < 0:
+        raise ValueError("Cannot compute square root of a negative number")
+    return num ** 0.5
 
 
 _URL = "http://my-service"

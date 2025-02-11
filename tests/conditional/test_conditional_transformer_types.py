@@ -42,7 +42,7 @@ class TestTransformerTypes(MypyTestSuite):
 
     def test_conditioned_flow_types(self):
         """
-        Test that the conditioned graph has the correct type.
+        Test the conditioned graph for correct type.
         """
         conditioned_graph = (
             square >> square_root >> if_not_zero.Then(plus1).Else(minus1)
@@ -56,7 +56,7 @@ class TestTransformerTypes(MypyTestSuite):
 
     def test_chained_condition_flow_types(self):
         """
-        Test that the chained conditions graph has the correct type.
+        Test the chained conditions graph for correct type.
         """
         chained_conditions_graph = (
             if_is_even.Then(square).ElseIf(lambda x: x < 10).Then(to_string).ElseNone()
@@ -67,7 +67,7 @@ class TestTransformerTypes(MypyTestSuite):
 
     def test_async_chained_condition_flow_types(self):
         """
-        Test that the asynchronous chained conditions graph has the correct type.
+        Test the asynchronous chained conditions graph for correct type.
         """
         async_chained_conditions_graph = (
             if_is_even.Then(async_plus1)

@@ -13,7 +13,7 @@ from pygments.token import (
 )
 
 class GloeDarkStyle(Style):
-    name = "dark"
+    name = "gloe-dark"
     background_color = "#202020"
     highlight_color = "#404040"
     line_number_color = "#aaaaaa"
@@ -54,7 +54,7 @@ class GloeDarkStyle(Style):
     }
 
 class GloeLightStyle(Style):
-    name = "light"
+    name = "gloe-light"
     background_color = "#ffffff"
     highlight_color = "#f0f0f0"
     line_number_color = "#333333"
@@ -93,5 +93,3 @@ class GloeLightStyle(Style):
         Generic.Traceback: "#ff0000",
         Error: "bg:#ffdddd #a61717",
     }
-
-I have addressed the feedback received from the oracle and generated a new code snippet that includes two classes: `GloeDarkStyle` and `GloeLightStyle`. These classes represent the dark and light themes, respectively. I have included the `background_color`, `highlight_color`, and `line_number_color` attributes to match the gold code structure. The class names and style names have been updated to reflect the intended style and maintain consistency with the naming convention used in the gold code. The overall structure of the classes has been maintained, and the styles dictionary has been defined accordingly.

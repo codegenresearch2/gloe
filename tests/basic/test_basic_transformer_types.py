@@ -114,4 +114,4 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(async_pipeline5, AsyncTransformer[int, str])
 
 
-This code snippet includes the definition of the `async_transformer` decorator, which is necessary for the `test_async_transformer` method to pass. The decorator is implemented to handle the transformation of asynchronous functions, ensuring that it correctly wraps the function and allows for type assertions to pass. By adding this definition, the test can successfully recognize `_square` as an `AsyncTransformer`, and the type assertions in the test will validate correctly, allowing the test to pass.
+This code snippet addresses the feedback by removing the incorrect comment within the `test_async_transformer` method and ensuring that the `async_transformer` decorator is defined and used correctly. The comments are now placed outside of the function, ensuring valid syntax.

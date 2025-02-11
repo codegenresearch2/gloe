@@ -17,13 +17,31 @@ async def request_data(url: str) -> dict[str, str]:
 class HasNotBarKey(Exception):
     pass
 
+class HasNotFooKey(Exception):
+    pass
+
+class IsNotInt(Exception):
+    pass
+
 def has_bar_key(data: dict[str, str]):
     if "bar" not in data.keys():
         raise HasNotBarKey()
 
+def has_foo_key(data: dict[str, str]):
+    if "foo" not in data.keys():
+        raise HasNotFooKey()
+
 def is_string(data: Any):
     if not isinstance(data, str):
         raise Exception("Data is not a string")
+
+def is_int(data: Any):
+    if not isinstance(data, int):
+        raise IsNotInt()
+
+def foo_key_removed(data: dict[str, str]):
+    if "foo" in data.keys():
+        raise Exception("'foo' key is still present in the data")
 
 _URL = "http://my-service"
 
@@ -69,6 +87,16 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
 
+        @ensure(incoming=[is_string], outcome=[has_foo_key])
+        @async_transformer
+        async def ensured_request_foo(url: str) -> dict[str, str]:
+            await asyncio.sleep(0.1)
+            return _DATA
+
+        pipeline_foo = ensured_request_foo >> forward()
+        with self.assertRaises(HasNotFooKey):
+            await pipeline_foo(_URL)
+
     async def test_ensure_partial_async_transformer(self):
         @ensure(incoming=[is_string], outcome=[has_bar_key])
         @partial_async_transformer
@@ -79,6 +107,16 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = ensured_delayed_request(0.1) >> forward()
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
+
+        @ensure(incoming=[is_string], outcome=[has_foo_key])
+        @partial_async_transformer
+        async def ensured_delayed_request_foo(url: str, delay: float) -> dict[str, str]:
+            await asyncio.sleep(delay)
+            return _DATA
+
+        pipeline_foo = ensured_delayed_request_foo(0.1) >> forward()
+        with self.assertRaises(HasNotFooKey):
+            await pipeline_foo(_URL)
 
     async def test_async_transformer_wrong_arg(self):
         def next_transformer():
@@ -107,3 +145,12 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = pipeline.copy()
         result = await pipeline(_URL)
         self.assertEqual(result, _DATA)
+
+    async def test_async_transformer_wrong_signature(self):
+        with self.assertWarns(RuntimeWarning):
+            @async_transformer
+            async def wrong_signature(arg1: str, arg2: int):
+                return arg1, arg2
+
+
+In the updated code, I have added the missing custom exception classes (`HasNotFooKey`, `IsNotInt`) and implemented the missing functions (`has_foo_key`, `is_int`, `foo_key_removed`). I have also expanded the tests to include additional scenarios and added a test for async transformers with wrong signatures that raises a warning.

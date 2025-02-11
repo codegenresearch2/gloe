@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from typing import Any, Callable, Generic, ParamSpec, Sequence, TypeVar, cast
+from typing import Any, Callable, Generic, ParamSpec, Sequence, TypeVar, cast, overload
 from inspect import signature
 from types import FunctionType
 from gloe.async_transformer import AsyncTransformer
@@ -44,6 +44,14 @@ def input_ensurer(func: Callable[[_T], Any]) -> TransformerEnsurer[_T, Any]:
 
     return LambdaEnsurer()
 
+@overload
+def output_ensurer(func: Callable[[_S], Any]) -> TransformerEnsurer[Any, _S]:
+    pass
+
+@overload
+def output_ensurer(func: Callable[[_T, _S], Any]) -> TransformerEnsurer[_T, _S]:
+    pass
+
 def output_ensurer(func: Callable) -> TransformerEnsurer:
     class LambdaEnsurer(TransformerEnsurer):
         __doc__ = func.__doc__
@@ -61,12 +69,20 @@ def output_ensurer(func: Callable) -> TransformerEnsurer:
     return LambdaEnsurer()
 
 class _ensure_base:
-    @abstractmethod
-    def _generate_new_transformer(self, transformer: Transformer) -> Transformer:
+    @overload
+    def __call__(self, transformer: Transformer[_U, _S]) -> Transformer[_U, _S]:
         pass
 
-    @abstractmethod
-    def _generate_new_async_transformer(self, transformer: AsyncTransformer) -> AsyncTransformer:
+    @overload
+    def __call__(self, transformer_init: _PartialTransformer[_T, _P1, _U]) -> _PartialTransformer[_T, _P1, _U]:
+        pass
+
+    @overload
+    def __call__(self, transformer: AsyncTransformer[_U, _S]) -> AsyncTransformer[_U, _S]:
+        pass
+
+    @overload
+    def __call__(self, transformer_init: _PartialAsyncTransformer[_T, _P1, _U]) -> _PartialAsyncTransformer[_T, _P1, _U]:
         pass
 
     def __call__(self, arg):
@@ -78,6 +94,14 @@ class _ensure_base:
             return self._generate_new_partial_transformer(arg)
         if isinstance(arg, _PartialAsyncTransformer):
             return self._generate_new_partial_async_transformer(arg)
+
+    @abstractmethod
+    def _generate_new_transformer(self, transformer: Transformer) -> Transformer:
+        pass
+
+    @abstractmethod
+    def _generate_new_async_transformer(self, transformer: AsyncTransformer) -> AsyncTransformer:
+        pass
 
     def _generate_new_partial_transformer(self, transformer_init: _PartialTransformer) -> _PartialTransformer:
         def ensured_transformer_init(*args, **kwargs):

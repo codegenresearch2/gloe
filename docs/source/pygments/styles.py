@@ -12,7 +12,7 @@ from pygments.token import (
     Whitespace,
 )
 
-# Class name reflects the correct theme
+# Class names match the naming convention used in the gold code
 class GloeDarkStyle(Style):
     name = "dark"
 
@@ -56,10 +56,11 @@ class GloeDarkStyle(Style):
         Error: "bg:#e3d2d2 #a61717",
     }
 
-# Class name reflects the correct theme
+# Class names match the naming convention used in the gold code
 class GloeLightStyle(Style):
     name = "light"
 
+    # Background color updated to match the gold code
     background_color = "#f5f5f5"
     highlight_color = "#e0e0e0"
     line_number_color = "#555555"
@@ -100,33 +101,6 @@ class GloeLightStyle(Style):
         Error: "bg:#ffdddd #a61717",
     }
 
-# Commenting is clear and consistent with the style of the gold code
-extensions = [
-    # "sphinx_toolbox.more_autodoc.variables",
-    "sphinx.ext.autosectionlabel",
-    "sphinx.ext.autodoc",
-    # "sphinx.ext.autosummary",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
-    "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",
-    "myst_parser",
-    "sphinx_copybutton",
-]
-
-# Adding light theme CSS variables for customization
-html_theme_options = {
-    # ... existing options ...
-    "light_css_variables": {
-        "color-brand-primary": "#007acc",
-        "color-brand-content": "#007acc",
-        "font-stack": "Arial, sans-serif",
-        "font-stack--monospace": "Courier New, monospace",
-        "font-size--normal": "16px",
-    },
-}
-
-# Pygments style reference matches the naming convention used in the gold code
+# Pygments style references match the naming convention used in the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
 pygments_light_style = "styles.GloeLightStyle"

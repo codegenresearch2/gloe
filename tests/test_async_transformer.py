@@ -18,6 +18,10 @@ async def request_data(url: str) -> dict[str, str]:
     return _DATA
 
 
+class UnsupportedTransformerArgException(Exception):
+    pass
+
+
 class HasNotBarKey(Exception):
     pass
 
@@ -108,10 +112,10 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def just_a_normal_function():
             return None
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(UnsupportedTransformerArgException):
             _ = square >> just_a_normal_function  # type: ignore
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(UnsupportedTransformerArgException):
             _ = square >> (just_a_normal_function, plus1)  # type: ignore
 
     async def test_transformer_copy(self):

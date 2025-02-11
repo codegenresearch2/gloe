@@ -12,7 +12,7 @@ _URL = "http://my-service"
 
 def is_string(value):
     if not isinstance(value, str):
-        raise Exception(f"Expected str, but got {type(value).__name__}")
+        raise TypeError(f"Expected str, but got {type(value).__name__}")
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
@@ -22,9 +22,9 @@ async def request_data(url: str) -> dict[str, str]:
 class HasNotBarKey(Exception):
     pass
 
-def has_bar_key(dict: dict[str, str]):
-    if "bar" not in dict.keys():
-        raise HasNotBarKey()
+def has_bar_key(data: dict[str, str]):
+    if "bar" not in data.keys():
+        raise HasNotBarKey("The 'bar' key is missing from the data.")
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
@@ -102,3 +102,97 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = request_data >> another_transformer
         copied_pipeline = pipeline.copy()
         self.assertEqual(pipeline, copied_pipeline)
+
+    def test_async_transformer_wrong_arg(self):
+        def just_a_normal_function():
+            return None
+
+        with self.assertRaises(
+            UnsupportedTransformerArgException,
+            msg=f"Unsupported transformer argument: {just_a_normal_function}",
+        ):
+            _ = request_data >> just_a_normal_function  # type: ignore
+
+    def test_async_transformer_wrong_signature(self):
+        with self.assertWarns(RuntimeWarning):
+            @async_transformer  # type: ignore
+            async def many_args(arg1: str, arg2: int):
+                return arg1, arg2
+
+    def test_async_transformer_hash(self):
+        self.assertEqual(hash(request_data.id), request_data.__hash__())
+
+    def test_async_transformer_previous_property(self):
+        pipeline = request_data >> forward()
+        self.assertEqual(pipeline.previous, request_data)
+
+    def test_async_transformer_equality(self):
+        pipeline = request_data >> forward()
+        self.assertEqual(request_data, request_data)
+        self.assertEqual(request_data, request_data.copy())
+        self.assertNotEqual(pipeline, forward())
+        self.assertNotEqual(request_data, forward())
+
+    def test_async_transformer_pydoc_keeping(self):
+        @async_transformer
+        async def to_string(num: int) -> str:
+            """
+            This transformer receives a number as input and returns its representation as a string
+            """
+            return str(num)
+
+        self.assertEqual(
+            to_string.__doc__,
+            """
+            This transformer receives a number as input and returns its representation as a string
+            """,
+        )
+
+    def test_async_transformer_signature_representation(self):
+        signature = request_data.signature()
+        self.assertEqual(str(signature), "(url: str) -> dict[str, str]")
+
+    def test_async_transformer_error_forward(self):
+        @async_transformer
+        async def raise_error(data: dict[str, str]) -> dict[str, str]:
+            raise ValueError("An error occurred")
+
+        pipeline = request_data >> raise_error
+        with self.assertRaises(ValueError):
+            await pipeline(_URL)
+
+    def test_async_transformer_error_handling(self):
+        @async_transformer
+        async def raise_error(data: dict[str, str]) -> dict[str, str]:
+            raise ValueError("An error occurred")
+
+        pipeline = request_data >> raise_error
+        try:
+            await pipeline(_URL)
+        except ValueError as exception:
+            self.assertEqual(type(exception.__cause__), TransformerException)
+            exception_ctx = cast(TransformerException, exception.__cause__)
+            self.assertEqual(raise_error, exception_ctx.raiser_transformer)
+
+    def test_partial_async_transformer(self):
+        @partial_async_transformer
+        async def delayed_request(url: str, delay: float) -> dict[str, str]:
+            await asyncio.sleep(delay)
+            return _DATA
+
+        pipeline = delayed_request(0.1) >> forward()
+        result = await pipeline(_URL)
+        self.assertEqual(result, _DATA)
+
+    def test_async_transformers_on_a_running_event_loop(self):
+        async def run_main():
+            pipeline = request_data >> forward()
+            result = await pipeline(_URL)
+            self.assertDictEqual(result, _DATA)
+
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(run_main())
+
+# Run the tests
+if __name__ == "__main__":
+    unittest.main()

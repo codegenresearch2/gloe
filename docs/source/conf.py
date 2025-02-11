@@ -27,9 +27,8 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    # "sphinx.ext.intersphinx",
+    "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -39,7 +38,7 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
@@ -62,7 +61,7 @@ autodoc_type_aliases = {
 
 html_title = "Gloe"
 html_theme = "furo"
-# html_last_updated_fmt = ""
+html_last_updated_fmt = ""
 # html_logo = "assets/gloe-logo-small.png"
 # html_use_index = False  # Don't create index
 # html_domain_indices = False  # Don't need module indices

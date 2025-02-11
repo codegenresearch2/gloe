@@ -34,26 +34,23 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
-ogp_site_url = "https://gloe.ideos.com.br/"
-ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
-
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
-autodoc_typehints = "description"
-autodoc_type_aliases = {
-    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
-}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = "Gloe"
+# html_logo = "assets/gloe-logo-small.png"
 html_theme = "furo"
 html_last_updated_fmt = ""
-html_sidebars = {
-    "Home": ["/"],
-}
+# html_use_index = False  # Don't create index
+# html_domain_indices = False  # Don't need module indices
+# html_copy_source = False  # Don't need sources
+# html_sidebars: dict[str, list[str]] = {
+#     "Home": ["/"]
+# }
+# autodoc_default_options = {"ignore-module-all": True}
+
 html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"

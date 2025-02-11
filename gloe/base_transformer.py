@@ -4,22 +4,7 @@ import uuid
 import inspect
 from functools import cached_property
 from inspect import Signature
-
-import networkx as nx
-from networkx import DiGraph, Graph
-from typing import (
-    Any,
-    Callable,
-    Generic,
-    TypeVar,
-    Union,
-    cast,
-    Iterable,
-    get_args,
-    get_origin,
-    TypeAlias,
-    Type,
-)
+from typing import Any, Callable, Generic, TypeVar, Union, cast, Iterable, get_args, get_origin, TypeAlias
 from uuid import UUID
 from itertools import groupby
 
@@ -83,15 +68,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def label(self) -> str:
-        """
-        Label used in visualization.
-
-        When the transformer is created by the `@transformer` decorator, it is the
-        name of the function.
-
-        When creating a transformer by extending the `Transformer` class, it is the name of
-        the class.
-        """
         return self._label
 
     @property
@@ -104,10 +80,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
     @property
     def previous(self) -> PreviousTransformer["BaseTransformer"]:
-        """
-        Previous transformers. It can be None, a single transformer, or a tuple of many
-        transformers.
-        """
         return self._previous
 
     @property
@@ -126,7 +98,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         self,
         transform: Callable[[_Self, _In], _Out] | None = None,
         regenerate_instance_id: bool = False,
-    ) -> _Self:
+    ):
         copied = copy.copy(self)
 
         func_type = types.MethodType
@@ -137,18 +109,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             copied.instance_id = uuid.uuid4()
 
         if self.previous is not None:
-            # copy_next_previous = 'none' if copy_previous == 'first_previous' else copy_previous
-            if type(self.previous) == tuple:
-                new_previous: list[BaseTransformer] = [
-                    previous_transformer.copy() for previous_transformer in self.previous
-                ]
-                copied._previous = cast(PreviousTransformer, tuple(new_previous))
-            elif isinstance(self.previous, BaseTransformer):
-                copied._previous = self.previous.copy()
+            copied._previous = self.previous.copy() if isinstance(self.previous, BaseTransformer) else self.previous
 
-        copied._children = [
-            child.copy(regenerate_instance_id=True) for child in self.children
-        ]
+        copied._children = [child.copy(regenerate_instance_id=True) for child in self.children]
 
         return copied
 
@@ -157,11 +120,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         nodes = {self.instance_id: self}
 
         if self.previous is not None:
-            if type(self.previous) == tuple:
-                for prev in self.previous:
-                    nodes = {**nodes, **prev.graph_nodes}
-            elif isinstance(self.previous, BaseTransformer):
-                nodes = {**nodes, **self.previous.graph_nodes}
+            nodes = {**nodes, **self.previous.graph_nodes}
 
         for child in self.children:
             nodes = {**nodes, **child.graph_nodes}
@@ -169,81 +128,51 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         return nodes
 
     def _set_previous(self, previous: PreviousTransformer):
-        if self.previous is None:
-            self._previous = previous
-        elif type(self.previous) == tuple:
-            for previous_transformer in self.previous:
-                previous_transformer._set_previous(previous)
-        elif isinstance(self.previous, BaseTransformer):
-            self.previous._set_previous(previous)
+        self._previous = previous
 
     def signature(self) -> Signature:
         return self._signature(type(self))
 
-    def _signature(self, klass: Type) -> Signature:
+    def _signature(self, klass: type) -> Signature:
         orig_bases = getattr(self, "__orig_bases__", [])
         transformer_args = [
             get_args(base) for base in orig_bases if get_origin(base) == klass
-        ]
-        generic_args = [
-            get_args(base) for base in orig_bases if get_origin(base) == Generic
         ]
 
         orig_class = getattr(self, "__orig_class__", None)
 
         specific_args = {}
-        if (
-            len(transformer_args) == 1
-            and len(generic_args) == 1
-            and orig_class is not None
-        ):
-            generic_arg = generic_args[0]
-            transformer_arg = transformer_args[0]
-            specific_args = {
-                generic: specific
-                for generic, specific in zip(generic_arg, get_args(orig_class))
-                if generic in transformer_arg
-            }
+        if orig_class is not None:
+            generic_args = get_args(orig_class)
+            if len(transformer_args) == 1 and len(generic_args) == 1:
+                specific_args = {generic: specific for generic, specific in zip(generic_args, get_args(orig_class)) if generic in transformer_args[0]}
 
         signature = inspect.signature(self.transform)
-        new_return_annotation = specific_args.get(
-            signature.return_annotation, signature.return_annotation
-        )
+        new_return_annotation = specific_args.get(signature.return_annotation, signature.return_annotation)
         parameters = list(signature.parameters.values())
         if len(parameters) > 0:
             parameter = parameters[0]
-            parameter = parameter.replace(
-                annotation=specific_args.get(parameter.annotation, parameter.annotation)
-            )
-            return signature.replace(
-                return_annotation=new_return_annotation,
-                parameters=[parameter],
-            )
+            parameter = parameter.replace(annotation=specific_args.get(parameter.annotation, parameter.annotation))
+            return signature.replace(return_annotation=new_return_annotation, parameters=[parameter])
 
         return signature.replace(return_annotation=new_return_annotation)
 
     @property
     def output_type(self) -> Any:
-        signature = self.signature()
-        return signature.return_annotation
+        return self.signature().return_annotation
 
     @property
     def output_annotation(self) -> str:
-        output_type = self.output_type
-
-        return_type = _format_return_annotation(output_type, None, None)
-        return return_type
+        return _format_return_annotation(self.output_type, None, None)
 
     @property
     def input_type(self) -> Any:
         parameters = list(self.signature().parameters.items())
-        if len(parameters) > 0:
-            parameter_type = parameters[0][1].annotation
-            return parameter_type
+        return parameters[0][1].annotation if len(parameters) > 0 else None
 
     @property
     def input_annotation(self) -> str:
-        return self.input_type.__name__
+        return self.input_type.__name__ if self.input_type else "Unknown"
 
     def _add_net_node(self, net: Graph, custom_data: dict[str, Any] = {}):
         node_id = self.node_id
@@ -276,9 +205,6 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
                 if previous.previous is None:
                     return previous
 
-                if type(previous.previous) == tuple:
-                    return previous.previous
-
                 return previous.visible_previous
             else:
                 return previous
@@ -295,33 +221,21 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
             net.add_nodes_from(child_net.nodes.data())
             net.add_edges_from(child_net.edges.data())
 
-            child_root_node = [n for n in child_net.nodes if child_net.in_degree(n) == 0][
-                0
-            ]
-            child_final_node = [
-                n for n in child_net.nodes if child_net.out_degree(n) == 0
-            ][0]
+            child_root_node = [n for n in child_net.nodes if child_net.in_degree(n) == 0][0]
+            child_final_node = [n for n in child_net.nodes if child_net.out_degree(n) == 0][0]
 
             if self.invisible:
                 if type(visible_previous) == tuple:
                     for prev in visible_previous:
-                        net.add_edge(
-                            prev.node_id, child_root_node, label=prev.output_annotation
-                        )
+                        net.add_edge(prev.node_id, child_root_node, label=prev.output_annotation)
                 elif isinstance(visible_previous, BaseTransformer):
-                    net.add_edge(
-                        visible_previous.node_id,
-                        child_root_node,
-                        label=visible_previous.output_annotation,
-                    )
+                    net.add_edge(visible_previous.node_id, child_root_node, label=visible_previous.output_annotation)
             else:
                 node_id = self._add_net_node(net)
                 net.add_edge(node_id, child_root_node)
 
             if child_final_node != next_node_id:
-                net.add_edge(
-                    child_final_node, next_node_id, label=next_node.input_annotation
-                )
+                net.add_edge(child_final_node, next_node_id, label=next_node.input_annotation)
 
     def _dag(
         self,
@@ -344,11 +258,8 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
                 for prev in previous:
                     previous_node_id = prev.node_id
 
-                    # TODO: check the impact of the below line to the Mapper transformer
                     if not prev.invisible and len(prev.children) == 0:
-                        net.add_edge(
-                            previous_node_id, next_node_id, label=prev.output_annotation
-                        )
+                        net.add_edge(previous_node_id, next_node_id, label=prev.output_annotation)
 
                     if previous_node_id not in in_nodes:
                         prev._dag(net, _next_node, custom_data)
@@ -362,13 +273,9 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
 
                 previous_node_id = previous.node_id
 
-                if len(previous.children) == 0 and (
-                    not previous.invisible or previous.previous is None
-                ):
+                if len(previous.children) == 0 and (not previous.invisible or previous.previous is None):
                     previous_node_id = previous._add_net_node(net)
-                    net.add_edge(
-                        previous_node_id, next_node_id, label=previous.output_annotation
-                    )
+                    net.add_edge(previous_node_id, next_node_id, label=previous.output_annotation)
 
                 if previous_node_id not in in_nodes:
                     previous._dag(net, _next_node, custom_data)
@@ -384,7 +291,7 @@ class BaseTransformer(Generic[_In, _Out, _Self]):
         self._dag(net)
         return net
 
-    def export(self, path: str, with_edge_labels: bool = True):  # pragma: no cover
+    def export(self, path: str, with_edge_labels: bool = True):
         net = self.graph()
         boxed_nodes = [
             node

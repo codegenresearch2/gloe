@@ -12,6 +12,20 @@ from tests.lib.transformers import async_plus1, async_natural_logarithm, minus1
 # Define constants
 _In = TypeVar("_In")
 _DATA = {"foo": "bar"}
+_URL = "http://my-service"
+
+# Define custom exceptions
+class DataValidationError(Exception):
+    """Exception raised for data validation errors."""
+    pass
+
+# Define helper functions
+def validate_data(data: dict[str, str], key: str, should_have: bool):
+    """Validate if the data has a specific key."""
+    if should_have and key not in data.keys():
+        raise DataValidationError(f"Data does not have '{key}' key.")
+    if not should_have and key in data.keys():
+        raise DataValidationError(f"Data should not have '{key}' key.")
 
 # Define async transformers
 @async_transformer
@@ -25,54 +39,6 @@ class RequestData(AsyncTransformer[str, dict[str, str]]):
     async def transform_async(self, url: str) -> dict[str, str]:
         await asyncio.sleep(0.01)
         return _DATA
-
-# Define custom exceptions
-class HasNotBarKey(Exception):
-    """Exception raised when the data does not have a 'bar' key."""
-    pass
-
-class HasNotFooKey(Exception):
-    """Exception raised when the data does not have a 'foo' key."""
-    pass
-
-class HasFooKey(Exception):
-    """Exception raised when the data has a 'foo' key."""
-    pass
-
-class IsNotInt(Exception):
-    """Exception raised when the data is not an integer."""
-    pass
-
-# Define helper functions
-def has_bar_key(data: dict[str, str]):
-    """Check if the data has a 'bar' key."""
-    if "bar" not in data.keys():
-        raise HasNotBarKey()
-
-def has_foo_key(data: dict[str, str]):
-    """Check if the data has a 'foo' key."""
-    if "foo" not in data.keys():
-        raise HasNotBarKey()
-
-def is_int(data: Any):
-    """Check if the data is an integer."""
-    if type(data) is not int:
-        raise IsNotInt()
-
-def is_str(data: Any):
-    """Check if the data is a string."""
-    if type(data) is not str:
-        raise Exception("data is not string")
-
-def foo_key_removed(incoming: dict[str, str], outcome: dict[str, str]):
-    """Check if the 'foo' key has been removed from the data."""
-    if "foo" not in incoming.keys():
-        raise HasNotFooKey()
-    if "foo" in outcome.keys():
-        raise HasFooKey()
-
-# Define constants
-_URL = "http://my-service"
 
 # Define test cases
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
@@ -107,7 +73,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         def next_transformer():
             pass
 
-        @ensure(outcome=[has_bar_key])
+        @ensure(outcome=[lambda data: validate_data(data, 'bar', True)])
         @partial_async_transformer
         async def ensured_delayed_request(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
@@ -162,7 +128,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         """Test the instantiation of a large graph."""
         graph = async_plus1
         max_iters = 1500
-        for i in range(max_iters):
+        for _ in range(max_iters):
             graph = graph >> async_plus1
         result = await graph(0)
         self.assertEqual(result, max_iters + 1)

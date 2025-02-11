@@ -13,12 +13,21 @@ _U = TypeVar("_U")
 _P1 = ParamSpec("_P1")
 
 class TransformerEnsurer(Generic[_T, _S], ABC):
+    """
+    Abstract base class for transformer ensurers.
+    """
     @abstractmethod
     def validate_input(self, data: _T):
+        """
+        Perform a validation on incoming data before executing the transformer code.
+        """
         pass
 
     @abstractmethod
     def validate_output(self, data: _T, output: _S):
+        """
+        Perform a validation on outcome data after executing the transformer code.
+        """
         pass
 
     def __call__(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
@@ -33,6 +42,9 @@ class TransformerEnsurer(Generic[_T, _S], ABC):
 
 def input_ensurer(func: Callable[[_T], Any]) -> TransformerEnsurer[_T, Any]:
     class LambdaEnsurer(TransformerEnsurer[_T, _S]):
+        __doc__ = func.__doc__
+        __annotations__ = cast(FunctionType, func).__annotations__
+
         def validate_input(self, data: _T):
             func(data)
 
@@ -43,6 +55,9 @@ def input_ensurer(func: Callable[[_T], Any]) -> TransformerEnsurer[_T, Any]:
 
 def output_ensurer(func: Callable) -> TransformerEnsurer:
     class LambdaEnsurer(TransformerEnsurer):
+        __doc__ = func.__doc__
+        __annotations__ = cast(FunctionType, func).__annotations__
+
         def validate_input(self, data):
             pass
 
@@ -193,6 +208,27 @@ class _ensure_both(Generic[_T, _S], _ensure_base):
         return transformer_cp
 
 def ensure(*args, **kwargs):
+    """
+    This decorator is used in transformers to ensure some validation based on its incoming
+    data, outcome data, or both. These validations are performed by validators. Validators
+    are simple callable functions that validate certain aspects of the input, output, or
+    the differences between them. If the validation fails, it must raise an exception.
+
+    Args:
+        incoming (Sequence[Callable[[_T], Any]]): sequence of validators that will be
+            applied to the incoming data. The type :code:`_T` refers to the incoming type.
+            Default value: :code:`[]`.
+        outcome (Sequence[Callable[[_S], Any]]): sequence of validators that will be
+            applied to the outcome data. The type :code:`_S` refers to the outcome type.
+            Default value: :code:`[]`.
+        changes (Sequence[Callable[[_T, _S], Any]]): sequence of validators that will be
+            applied to both incoming and outcome data. The type :code:`_T` refers to the
+            incoming type, and type :code:`_S` refers to the outcome type.
+            Default value: :code:`[]`.
+
+    Returns:
+        An instance of the appropriate _ensure_* class based on the provided arguments.
+    """
     if len(kwargs.keys()) == 1 and "incoming" in kwargs:
         return _ensure_incoming(kwargs["incoming"])
 

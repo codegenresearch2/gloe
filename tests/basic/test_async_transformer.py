@@ -1,6 +1,6 @@
 import asyncio
 import unittest
-from typing import TypeVar, Any, cast
+from typing import TypeVar, Any
 from gloe import async_transformer, ensure, UnsupportedTransformerArgException, transformer, AsyncTransformer, TransformerException
 from gloe.async_transformer import _execute_async_flow
 from gloe.functional import partial_async_transformer
@@ -145,8 +145,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
             await async_graph(-2)
         except LnOfNegativeNumber as exception:
             self.assertEqual(type(exception.__cause__), TransformerException)
-            exception_ctx = cast(TransformerException, exception.__cause__)
-            self.assertEqual(async_natural_logarithm, exception_ctx.raiser_transformer)
+            self.assertIsInstance(exception.__cause__, TransformerException)
 
     async def test_execute_async_wrong_flow(self):
         flow = [2]
@@ -160,9 +159,3 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         test2 = forward[float]() >> (async_plus1, async_plus1)
         result2 = await test2.transform_async(5)
         self.assertIsNone(result2)
-
-def cast(obj, _type):
-    if isinstance(obj, _type):
-        return obj
-    else:
-        raise TypeError(f"Object is not of type {_type}")

@@ -2,6 +2,7 @@ import asyncio
 import types
 from inspect import Signature
 from typing import TypeVar, Any, cast
+from types import GenericAlias
 
 from gloe.async_transformer import AsyncTransformer
 from gloe.base_transformer import BaseTransformer
@@ -15,6 +16,8 @@ _NextOut = TypeVar("_NextOut")
 
 
 def is_transformer(node: Any) -> bool:
+    if isinstance(node, (list, tuple)):
+        return all(is_transformer(n) for n in node)
     return isinstance(node, Transformer)
 
 

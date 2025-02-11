@@ -25,9 +25,9 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
-    # "sphinx_autodoc_typehints",  # Consider including this extension
     "myst_parser",
     "sphinx_copybutton",
+    # "sphinx_autodoc_typehints",  # Consider including this extension based on the gold code
 ]
 
 # Configuration options
@@ -41,13 +41,13 @@ ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
 # HTML output options
 html_title = "Gloe"
-# html_logo = "assets/gloe-logo-small.png"  # Consider including this option
+# html_logo = "assets/gloe-logo-small.png"  # Consider including this option based on the gold code
 html_theme = "furo"
 html_last_updated_fmt = ""
-# html_use_index = False  # Consider including this option
-# html_domain_indices = False  # Consider including this option
-# html_copy_source = False  # Consider including this option
-html_sidebars = {
+# html_use_index = False  # Consider including this option based on the gold code
+# html_domain_indices = False  # Consider including this option based on the gold code
+# html_copy_source = False  # Consider including this option based on the gold code
+html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
 html_static_path = ["_static"]
@@ -78,6 +78,7 @@ html_theme_options = {
 }
 
 # Pygments style options
+# pygments_style = "styles.GloeStyle"  # Consider including this option based on the gold code
 pygments_dark_style = "styles.GloeDarkStyle"
 pygments_light_style = "styles.GloeLightStyle"
 

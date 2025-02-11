@@ -60,9 +60,9 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
             self.handle_exception(exception)
 
         if transformed is None:
-            raise NotImplementedError
+            raise NotImplementedError(f"{self.__class__.__name__} did not return a value")
 
-        return cast(_Out, transformed)
+        return transformed
 
     def validate_input(self, data: _In) -> bool:
         # Add input validation logic here

@@ -26,6 +26,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinxext.opengraph",
+    # "sphinx.ext.autosummary",  # Commented out as per gold code
+    # "sphinx_autodoc_typehints",  # Commented out as per gold code
     "myst_parser",
     "sphinx_copybutton",
 ]
@@ -59,7 +61,7 @@ html_static_path = ["_static"]
 html_css_files = ["theme_customs.css"]
 html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
-    # "main_nav_links": {"Docs": "/index", "About": "/about"},  # Added as per gold code
+    # "main_nav_links": {"Docs": "/index", "About": "/about"},  # Commented out as per gold code
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
     "dark_css_variables": {
@@ -92,3 +94,4 @@ html_theme_options = {
 
 # pygments_style = "styles.GloeDarkStyle"  # Commented out as per gold code
 pygments_dark_style = "styles.GloeLightStyle"
+pygments_light_style = "styles.GloeDarkStyle"  # Added as per gold code

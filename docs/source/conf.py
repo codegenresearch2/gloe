@@ -56,14 +56,15 @@ autodoc_type_aliases = {
 }
 
 # Pygments styles
-# pygments_dark_style = "styles.GloeDarkStyle"
-# pygments_light_style = "styles.GloeLightStyle"
+pygments_style = "styles.GloeStyle"
+pygments_dark_style = "styles.GloeDarkStyle"
+pygments_light_style = "styles.GloeLightStyle"
 
 # HTML theme options
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
-    "dark_css_variables": {
+    "light_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
@@ -87,3 +88,6 @@ html_theme_options = {
 # Additional options
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
+html_static_path = ["_static"]
+html_css_files = ["theme_customs.css"]
+html_favicon = "_static/assets/favicon.ico"

@@ -30,31 +30,13 @@ extensions = [
     "myst_parser",
     "sphinx_copybutton",
 ]
+# "sphinx_autodoc_typehints",
+
 overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
-
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
-html_title = "Gloe"
-html_theme = "furo"
-html_last_updated_fmt = ""
-# html_use_index = False  # Don't create index
-# html_domain_indices = False  # Don't need module indices
-# html_copy_source = False  # Don't need sources
-html_sidebars = {
-    "**": ["sidebar/brand.html", "sidebar/search.html", "sidebar/scroll-start.html"]
-}
-
-templates_path = ["_templates"]
-exclude_patterns = ["Thumbs.db", ".DS_Store"]
-autodoc_typehints = "description"
-autodoc_type_aliases = {
-    "PreviousTransformer": "gloe.base_transformer.PreviousTransformer"
-}
+intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -101,3 +83,7 @@ html_theme_options = {
         },
     ],
 }
+
+# Additional options
+ogp_site_url = "https://gloe.ideos.com.br/"
+ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"

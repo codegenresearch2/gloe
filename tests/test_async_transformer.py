@@ -7,7 +7,7 @@ from gloe.utils import forward
 
 _In = TypeVar("_In")
 
-_DATA = {"bar": "baz"}
+_DATA = {"foo": "bar"}
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
@@ -95,7 +95,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         @async_transformer
         async def ensured_request_foo(url: str) -> dict[str, str]:
             await asyncio.sleep(0.1)
-            return _DATA
+            return {"bar": "baz"}
 
         pipeline_foo = ensured_request_foo >> forward()
         with self.assertRaises(HasNotFooKey):
@@ -116,7 +116,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         @partial_async_transformer
         async def ensured_delayed_request_foo(url: str, delay: float) -> dict[str, str]:
             await asyncio.sleep(delay)
-            return _DATA
+            return {"bar": "baz"}
 
         pipeline_foo = ensured_delayed_request_foo(0.1) >> forward()
         with self.assertRaises(HasNotFooKey):
@@ -187,12 +187,3 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         pipeline = remove_foo_key >> forward()
         with self.assertRaises(HasFooKey):
             await pipeline({"foo": "bar"})
-
-I have addressed the feedback provided by the oracle and made the necessary changes to the code. Here's the updated code:
-
-1. I have modified the `_DATA` dictionary to not include the "foo" key when the `ensured_request_foo` and `ensured_delayed_request_foo` functions are called.
-2. I have updated the `has_foo_key` function to raise the `HasNotFooKey` exception instead of `HasNotBarKey`.
-3. I have updated the `foo_key_removed` function to take both `incoming` and `outcome` parameters and to raise the `HasFooKey` exception if the "foo" key is still present in the outcome.
-4. I have updated the test cases to reflect the changes made to the code.
-
-Now the code should be closer to the gold standard and should pass all the tests.

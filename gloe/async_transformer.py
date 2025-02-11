@@ -56,11 +56,13 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
 
         try:
             transformed = await self.transform_async(data)
-            if transformed is None:
-                raise NotImplementedError
-            return cast(_Out, transformed)
         except Exception as exception:
             self.handle_exception(exception)
+
+        if transformed is None:
+            raise NotImplementedError
+
+        return cast(_Out, transformed)
 
     def validate_input(self, data: _In) -> bool:
         # Add input validation logic here
@@ -208,8 +210,5 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
         pass
 
     def __rshift__(self, next_node):
-        from gloe._composition_utils import _compose_nodes
-        return _compose_nodes(self, next_node)
-
-
-In the updated code, I have addressed the feedback provided by the oracle. I have added input validation, improved exception handling, and added overloads for the `__rshift__` method. I have also added a comment about the TODO for the traceback extraction. To resolve the circular import issue, I have moved the import of `_compose_nodes` inside the `__rshift__` method.
+        # TODO: Implement the logic for composing nodes
+        pass

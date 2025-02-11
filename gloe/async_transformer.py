@@ -57,7 +57,16 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
 
     async def __call__(self, data: _In) -> _Out:
         try:
-            return await self.transform_async(data)
+            result = await self.transform_async(data)
+            if result is None:
+                raise TransformerException(
+                    internal_exception=NotImplementedError("Transform method did not return a valid result"),
+                    raiser_transformer=self,
+                    message="Transform method did not return a valid result",
+                )
+            return cast(_Out, result)
+        except TransformerException as e:
+            raise e
         except Exception as e:
             tb = traceback.extract_tb(e.__traceback__)
             transformer_frames = [
@@ -191,9 +200,7 @@ class AsyncTransformer(BaseTransformer[_In, _Out, "AsyncTransformer"], ABC):
             BaseTransformer[_Out, _Out6, Any],
             BaseTransformer[_Out, _Out7, Any],
         ],
-    ) -> (
-        "AsyncTransformer[_In, tuple[_NextOut, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]]"
-    ):
+    ) -> "AsyncTransformer[_In, tuple[_NextOut, _Out2, _Out3, _Out4, _Out5, _Out6, _Out7]]":
         pass
 
     def __rshift__(self, next_node):

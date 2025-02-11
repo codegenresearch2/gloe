@@ -1,13 +1,6 @@
-from typing import TypeVar
-
+from typing import TypeVar, Union
 from typing_extensions import assert_type
-
-from gloe import (
-    Transformer,
-    async_transformer,
-    AsyncTransformer,
-)
-from gloe.experimental import bridge
+from gloe import Transformer, AsyncTransformer
 from gloe.utils import forward
 from tests.lib.transformers import (
     square,
@@ -66,7 +59,9 @@ class TestBasicTransformerTypes(MypyTestSuite):
         assert_type(graph4, Transformer[float, tuple[str, float, str, float]])
 
         graph5 = (
-            square >> square_root >> (to_string, square, to_string, square, to_string)
+            square
+            >> square_root
+            >> (to_string, square, to_string, square, to_string)
         )
         assert_type(graph5, Transformer[float, tuple[str, float, str, float, str]])
 

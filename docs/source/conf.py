@@ -35,7 +35,7 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out as per gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
@@ -54,7 +54,7 @@ html_last_updated_fmt = ""
 # html_use_index = False  # Commented out as per gold code
 # html_domain_indices = False  # Commented out as per gold code
 # html_copy_source = False  # Commented out as per gold code
-html_sidebars: dict[str, list[str]] = {  # Type annotation added as per gold code
+html_sidebars: dict[str, list[str]] = {
     "Home": ["/"],
 }
 html_static_path = ["_static"]
@@ -63,14 +63,14 @@ html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
-    "light_css_variables": {  # Added as per gold code
+    "dark_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
         "font-stack--monospace": "Courier, monospace",
         "font-size--normal": "Courier, monospace",
     },
-    "dark_css_variables": {
+    "light_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",
@@ -91,5 +91,5 @@ html_theme_options = {
     ],
 }
 
-pygments_style = "styles.GloeDarkStyle"
+# pygments_style = "styles.GloeDarkStyle"  # Commented out as per gold code
 pygments_dark_style = "styles.GloeLightStyle"

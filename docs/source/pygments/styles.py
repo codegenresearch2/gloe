@@ -12,11 +12,11 @@ from pygments.token import (
     Whitespace,
 )
 
-# Class Naming: Using the same naming convention as the gold code
+# Class Naming and Structure: Matching the gold code
 class GloeLightStyle(Style):
     name = "gloe_light"
 
-    # Style Properties: Matching the specific values used in the gold code
+    # Style Properties: Matching the specific values used in the gold code for light style
     background_color = "#f7f7f7"
     highlight_color = "#e0e0e0"
     line_number_color = "#555555"
@@ -57,10 +57,50 @@ class GloeLightStyle(Style):
         Error: "bg:#ffdddd #a61717",
     }
 
-# Additional Classes: If your code is meant to represent both light and dark styles, consider how you might structure your classes to reflect that, similar to the gold code.
+# Additional Classes: Implementing the dark style class
 class GloeDarkStyle(Style):
-    # Define the dark style here, similar to the light style above
-    pass
+    name = "gloe_dark"
+
+    # Style Properties: Matching the specific values used in the gold code for dark style
+    background_color = "#202020"
+    highlight_color = "#404040"
+    line_number_color = "#aaaaaa"
+
+    styles = {
+        Token: "#d0d0d0",
+        Whitespace: "#666666",
+        Comment: "italic #ababab",
+        Comment.Preproc: "noitalic bold #ff3a3a",
+        Comment.Special: "noitalic bold #e50808 bg:#520000",
+        Keyword: "bold #45df9a",
+        Keyword.Pseudo: "nobold",
+        Operator.Word: "bold #45df9a",
+        String: "#6ad7ca",
+        String.Other: "#6ad7ca",
+        Number: "#51b2fd",
+        Name.Builtin: "#2fbccd",
+        Name.Variable: "#40ffff",
+        Name.Constant: "#40ffff",
+        Name.Class: "underline #14c8ef",
+        Name.Function: "#14c8ef",
+        Name.Namespace: "underline #14c8ef",
+        Name.Exception: "#bbbbbb",
+        Name.Tag: "bold #45df9a",
+        Name.Attribute: "#bbbbbb",
+        Name.Decorator: "#6ad7ca",
+        Generic.Heading: "bold #ffffff",
+        Generic.Subheading: "underline #ffffff",
+        Generic.Deleted: "#ff3a3a",
+        Generic.Inserted: "#589819",
+        Generic.Error: "#ff3a3a",
+        Generic.Emph: "italic",
+        Generic.Strong: "bold",
+        Generic.EmphStrong: "bold italic",
+        Generic.Prompt: "#aaaaaa",
+        Generic.Output: "#cccccc",
+        Generic.Traceback: "#ff3a3a",
+        Error: "bg:#e3d2d2 #a61717",
+    }
 
 # Pygments Style Reference: Matching the naming convention used in the gold code
 pygments_style = "styles.GloeLightStyle"

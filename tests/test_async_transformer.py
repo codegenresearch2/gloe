@@ -21,16 +21,25 @@ async def request_data(url: str) -> dict[str, str]:
     return _DATA
 
 
-class HasNotBarKey(Exception):
+class HasNotFooKey(Exception):
     pass
 
 
-class HasBarKey(Exception):
+class HasFooKey(Exception):
     pass
 
 
 class IsNotInt(Exception):
     pass
+
+
+class IsNotStr(Exception):
+    pass
+
+
+def has_foo_key(dict: dict[str, str]):
+    if "foo" not in dict.keys():
+        raise HasNotFooKey()
 
 
 def has_bar_key(dict: dict[str, str]):
@@ -43,9 +52,9 @@ def is_int(data: Any):
         raise IsNotInt()
 
 
-def bar_key_removed(dict: dict[str, str]):
-    if "bar" in dict.keys():
-        raise HasBarKey()
+def is_str(data: Any):
+    if not isinstance(data, str):
+        raise IsNotStr()
 
 
 _URL = "http://my-service"
@@ -104,7 +113,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_request >> forward()
 
-        with self.assertRaises(HasNotBarKey):
+        with self.assertRaises(HasNotFooKey):
             await pipeline(_URL)
 
     async def test_ensure_partial_async_transformer(self):
@@ -116,7 +125,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
 
         pipeline = ensured_delayed_request(0.1) >> forward()
 
-        with self.assertRaises(HasNotBarKey):
+        with self.assertRaises(HasNotFooKey):
             await pipeline(_URL)
 
     async def test_async_transformer_wrong_arg(self):

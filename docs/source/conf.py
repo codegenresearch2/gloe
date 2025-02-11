@@ -19,10 +19,10 @@ extensions = [
     "sphinx_toolbox.more_autodoc.variables",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
+    # "sphinx.ext.autosummary",  # Commented out in gold code
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
-    "sphinx.ext.intersphinx",
+    # "sphinx.ext.intersphinx",  # Commented out in gold code
     "sphinxext.opengraph",
     # "sphinx_autodoc_typehints",  # Commented out in gold code
     "myst_parser",
@@ -32,11 +32,11 @@ overloads_location = "bottom"
 napoleon_google_docstring = True
 autosectionlabel_prefix_document = True
 napoleon_use_rtype = False
-intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}
+# intersphinx_mapping = {"httpx": ("https://www.python-httpx.org/", None)}  # Commented out in gold code
 ogp_site_url = "https://gloe.ideos.com.br/"
 ogp_image = "https://gloe.ideos.com.br/_static/assets/gloe-logo.png"
 
-templates_path = ["_templates"]  # Updated to match gold code
+templates_path = ["_templates"]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
 autodoc_typehints = "description"
 autodoc_type_aliases = {
@@ -60,7 +60,7 @@ html_favicon = "_static/assets/favicon.ico"
 html_theme_options = {
     "light_logo": "assets/gloe-logo-small.png",
     "dark_logo": "assets/gloe-logo-small.png",
-    "light_css_variables": {  # Added to match gold code
+    "light_css_variables": {
         "color-brand-primary": "#00e6bf",
         "color-brand-content": "#00e6bf",
         "font-stack": "Roboto, sans-serif",

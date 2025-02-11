@@ -14,17 +14,21 @@ class HasNotBarKey(Exception):
     pass
 
 def is_string(data: str):
-    if not isinstance(data, str):
+    if type(data) is not str:
         raise TypeError("Input data must be a string")
 
 def has_bar_key(dict: dict[str, str]):
     if "bar" not in dict.keys():
-        raise HasNotBarKey("Input dictionary must contain the 'bar' key")
+        raise HasNotBarKey
 
 @async_transformer
 async def request_data(url: str) -> dict[str, str]:
     await asyncio.sleep(0.1)
     return _DATA
+
+@async_transformer
+async def add_slash(url: str) -> str:
+    return url + "/"
 
 class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
     async def test_basic_case(self):
@@ -79,7 +83,7 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HasNotBarKey):
             await pipeline(_URL)
 
-    async def test_unsupported_transformer_argument(self):
+    async def test_async_transformer_wrong_arg(self):
         with self.assertRaises(UnsupportedTransformerArgException):
             _ = request_data >> 123  # type: ignore
 
@@ -88,3 +92,9 @@ class TestAsyncTransformer(unittest.IsolatedAsyncioTestCase):
         copied_pipeline = pipeline.copy()
         result = await copied_pipeline(_URL)
         self.assertDictEqual(result, _DATA)
+
+    async def test_pipeline_copying_with_transformer(self):
+        pipeline = add_slash >> forward()
+        copied_pipeline = pipeline.copy()
+        result = await copied_pipeline(_URL)
+        self.assertEqual(result, _URL + "/")

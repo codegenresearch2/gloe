@@ -139,4 +139,5 @@ class GloeStyle(Style):
         Error: "bg:#e3d2d2 #a61717",
     }
 
+pygments_light_style = "GloeStyle"
 pygments_dark_style = "GloeStyle"

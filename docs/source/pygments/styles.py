@@ -14,7 +14,7 @@ from pygments.token import (
 
 # Class Naming: Using the same naming convention as the gold code
 class GloeLightStyle(Style):
-    name = "custom_light"
+    name = "gloe_light"
 
     # Style Properties: Matching the specific values used in the gold code
     background_color = "#f7f7f7"
@@ -56,6 +56,11 @@ class GloeLightStyle(Style):
         Generic.Traceback: "#ff0000",
         Error: "bg:#ffdddd #a61717",
     }
+
+# Additional Classes: If your code is meant to represent both light and dark styles, consider how you might structure your classes to reflect that, similar to the gold code.
+class GloeDarkStyle(Style):
+    # Define the dark style here, similar to the light style above
+    pass
 
 # Pygments Style Reference: Matching the naming convention used in the gold code
 pygments_style = "styles.GloeLightStyle"

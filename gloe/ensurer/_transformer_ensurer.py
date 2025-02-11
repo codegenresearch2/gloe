@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Any, Callable, Generic, ParamSpec, Sequence, TypeVar, cast
 from inspect import signature
+from types import FunctionType
 from gloe.async_transformer import AsyncTransformer
 from gloe.functional import _PartialTransformer, _PartialAsyncTransformer, Transformer
 
@@ -12,40 +13,51 @@ _P1 = ParamSpec("_P1")
 class TransformerEnsurer(Generic[_T, _S], ABC):
     @abstractmethod
     def validate_input(self, data: _T):
+        """Perform a validation on incoming data before executing the transformer code"""
         pass
 
     @abstractmethod
     def validate_output(self, data: _T, output: _S):
+        """Perform a validation on outcome data after executing the transformer code"""
         pass
 
     def __call__(self, transformer: Transformer[_T, _S]) -> Transformer[_T, _S]:
-        return transformer.copy(lambda _, data: self.validate_and_transform(data, transformer))
+        def transform(this: Transformer, data: _T) -> _S:
+            self.validate_input(data)
+            output = transformer.transform(data)
+            self.validate_output(data, output)
+            return output
 
-    def validate_and_transform(self, data: _T, transformer: Transformer[_T, _S]) -> _S:
-        self.validate_input(data)
-        output = transformer.transform(data)
-        self.validate_output(data, output)
-        return output
+        transformer_cp = transformer.copy(transform)
+        return transformer_cp
 
 def input_ensurer(func: Callable[[_T], Any]) -> TransformerEnsurer[_T, Any]:
     class LambdaEnsurer(TransformerEnsurer[_T, Any]):
         __doc__ = func.__doc__
-        __annotations__ = cast(Callable, func).__annotations__
+        __annotations__ = cast(FunctionType, func).__annotations__
 
         def validate_input(self, data: _T):
             func(data)
+
+        def validate_output(self, data: _T, output: Any):
+            pass
+
     return LambdaEnsurer()
 
 def output_ensurer(func: Callable) -> TransformerEnsurer:
     class LambdaEnsurer(TransformerEnsurer):
         __doc__ = func.__doc__
-        __annotations__ = cast(Callable, func).__annotations__
+        __annotations__ = cast(FunctionType, func).__annotations__
 
-        def validate_output(self, data, output):
+        def validate_input(self, data: Any, output: Any):
+            pass
+
+        def validate_output(self, data: Any, output: Any):
             if len(signature(func).parameters) == 1:
                 func(output)
             else:
                 func(data, output)
+
     return LambdaEnsurer()
 
 class _ensure_base:

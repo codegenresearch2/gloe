@@ -92,5 +92,6 @@ html_theme_options = {
     ],
 }
 
+# pygments_style = "styles.GloeStyle"  # Commented out in the gold code
 pygments_style = "styles.GloeDarkStyle"
 pygments_dark_style = "styles.GloeLightStyle"

@@ -89,7 +89,15 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
 
     @abstractmethod
     def transform(self, data: I) -> O:
-        """Main method to be implemented and responsible to perform the transformer logic"""
+        """
+        Main method to be implemented and responsible to perform the transformer logic.
+
+        Args:
+            data: The input data passed to the transformer during the pipeline execution.
+
+        Returns:
+            The outcome data, which is the result of the transformation.
+        """
         pass
 
     def signature(self) -> Signature:
@@ -105,13 +113,12 @@ class Transformer(BaseTransformer[I, O, "Transformer"], ABC):
         try:
             transformed = self.transform(data)
         except Exception as exception:
-            if isinstance(exception, TransformerException):
-                transform_exception = exception
-            elif type(exception.__cause__) == TransformerException:
+            if type(exception.__cause__) == TransformerException:
                 transform_exception = exception.__cause__
             else:
                 tb = traceback.extract_tb(exception.__traceback__)
 
+                # TODO: Make this filter condition stronger
                 transformer_frames = [
                     frame
                     for frame in tb
